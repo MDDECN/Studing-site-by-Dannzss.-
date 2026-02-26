@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jardim do Saber</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde-escuro: #1a2e1a;
+    --verde-medio: #2d5a27;
+    --verde-claro: #4a8c3f;
+    --verde-musgo: #6b7c45;
+    --dourado: #c8a84b;
+    --creme: #f5f0e8;
+    --bege: #e8dfc8;
+    --marrom: #5c4a2a;
+    --texto: #2a1f0a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Lora', Georgia, serif;
+    background-color: var(--verde-escuro);
+    color: var(--creme);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .bg-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    background: 
+      radial-gradient(ellipse at 20% 20%, rgba(74,140,63,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(107,124,69,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(26,46,26,0.9) 0%, transparent 70%),
+      linear-gradient(160deg, #0d1f0d 0%, #1a2e1a 40%, #1e3820 100%);
+  }
+
+  .leaf {
+    position: fixed;
+    font-size: 1.2rem;
+    opacity: 0;
+    animation: leafFall linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @keyframes leafFall {
+    0% { transform: translateY(-50px) rotate(0deg) translateX(0); opacity: 0; }
+    10% { opacity: 0.4; }
+    90% { opacity: 0.2; }
+    100% { transform: translateY(110vh) rotate(360deg) translateX(60px); opacity: 0; }
+  }
+
+  header {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 3rem 2rem 2rem;
+    border-bottom: 1px solid rgba(200,168,75,0.2);
+  }
+
+  .logo-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 0.5rem;
+    filter: drop-shadow(0 0 20px rgba(74,140,63,0.6));
+    animation: breathe 4s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(74,140,63,0.6)); }
+    50% { transform: scale(1.05); filter: drop-shadow(0 0 35px rgba(74,140,63,0.9)); }
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 400;
+    color: var(--creme);
+    letter-spacing: 0.05em;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+  }
+
+  h1 span { color: var(--dourado); font-style: italic; }
+
+  .subtitle {
+    color: rgba(245,240,232,0.6);
+    margin-top: 0.5rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+  }
+
+  .music-player {
+    position: fixed;
+    bottom: 2rem; right: 2rem;
+    z-index: 100;
+    background: rgba(26,46,26,0.9);
+    border: 1px solid rgba(200,168,75,0.3);
+    border-radius: 50px;
+    padding: 0.75rem 1.25rem;
+    display: flex; align-items: center; gap: 0.75rem;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    transition: all 0.3s ease;
+  }
+
+  .music-player:hover { border-color: rgba(200,168,75,0.6); box-shadow: 0 8px 32px rgba(74,140,63,0.3); }
+
+  .play-btn {
+    background: var(--verde-claro); border: none;
+    width: 36px; height: 36px; border-radius: 50%;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem; transition: all 0.2s; color: white; flex-shrink: 0;
+  }
+  .play-btn:hover { background: var(--dourado); transform: scale(1.1); }
+
+  .music-info { display: flex; flex-direction: column; min-width: 120px; }
+  .music-title { font-size: 0.7rem; color: var(--dourado); letter-spacing: 0.1em; text-transform: uppercase; }
+  .music-status { font-size: 0.65rem; color: rgba(245,240,232,0.5); }
+
+  .volume-slider {
+    width: 70px; -webkit-appearance: none; appearance: none;
+    height: 3px; background: rgba(245,240,232,0.2); border-radius: 2px; outline: none; cursor: pointer;
+  }
+  .volume-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--dourado); cursor: pointer; }
+
+  .wave-bars { display: flex; align-items: center; gap: 2px; height: 20px; }
+  .bar { width: 3px; background: var(--verde-claro); border-radius: 2px; animation: wave 1.2s ease-in-out infinite; }
+  .bar:nth-child(1) { height: 6px; animation-delay: 0s; }
+  .bar:nth-child(2) { height: 14px; animation-delay: 0.1s; }
+  .bar:nth-child(3) { height: 10px; animation-delay: 0.2s; }
+  .bar:nth-child(4) { height: 18px; animation-delay: 0.15s; }
+  .bar:nth-child(5) { height: 8px; animation-delay: 0.3s; }
+  @keyframes wave { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.3); } }
+  .wave-bars.paused .bar { animation-play-state: paused; }
+
+  main {
+    position: relative; z-index: 10;
+    max-width: 1100px; margin: 0 auto; padding: 3rem 2rem 8rem;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 400;
+    color: var(--dourado); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(200,168,75,0.4), transparent); }
+
+  .topics-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
+
+  .topic-card {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(200,168,75,0.15);
+    border-radius: 16px; padding: 1.75rem; cursor: pointer; transition: all 0.3s ease;
+    position: relative; overflow: hidden;
+  }
+  .topic-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(74,140,63,0.08), transparent); opacity: 0; transition: opacity 0.3s; }
+  .topic-card:hover { border-color: rgba(200,168,75,0.4); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.3), 0 0 20px rgba(74,140,63,0.15); }
+  .topic-card:hover::before { opacity: 1; }
+  .topic-icon { font-size: 2.5rem; margin-bottom: 1rem; display: block; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3)); }
+  .topic-card h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 600; color: var(--creme); margin-bottom: 0.5rem; }
+  .topic-card p { font-size: 0.88rem; color: rgba(245,240,232,0.6); line-height: 1.6; }
+  .topic-tag { display: inline-block; margin-top: 1rem; padding: 0.25rem 0.75rem; background: rgba(74,140,63,0.2); border: 1px solid rgba(74,140,63,0.4); border-radius: 20px; font-size: 0.7rem; color: var(--verde-claro); letter-spacing: 0.1em; text-transform: uppercase; }
+
+  .study-area { background: rgba(255,255,255,0.03); border: 1px solid rgba(200,168,75,0.15); border-radius: 20px; padding: 2.5rem; margin-bottom: 3rem; }
+  .study-area h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 400; color: var(--creme); margin-bottom: 1.5rem; font-style: italic; }
+  .content-block { display: none; }
+  .content-block.active { display: block; animation: fadeIn 0.5s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .content-block p { font-size: 1rem; line-height: 1.8; color: rgba(245,240,232,0.85); margin-bottom: 1.25rem; }
+  .content-block h4 { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--dourado); margin-bottom: 0.75rem; margin-top: 1.5rem; }
+  .fact-box { background: rgba(74,140,63,0.1); border-left: 3px solid var(--verde-claro); padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin: 1.25rem 0; font-size: 0.92rem; color: rgba(245,240,232,0.8); font-style: italic; }
+
+  .quiz-section { margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(200,168,75,0.15); }
+  .quiz-section h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--dourado); margin-bottom: 1.25rem; }
+  .quiz-question { display: none; margin-bottom: 1.5rem; }
+  .quiz-question.visible { display: block; animation: fadeIn 0.4s ease; }
+  .quiz-question p { font-size: 1rem; color: var(--creme); margin-bottom: 1rem; font-weight: 500; }
+  .quiz-options { display: flex; flex-direction: column; gap: 0.6rem; }
+  .quiz-opt { background: rgba(255,255,255,0.04); border: 1px solid rgba(245,240,232,0.15); border-radius: 10px; padding: 0.75rem 1.1rem; cursor: pointer; font-family: 'Lora', serif; font-size: 0.9rem; color: rgba(245,240,232,0.8); text-align: left; transition: all 0.2s; }
+  .quiz-opt:hover { border-color: var(--verde-claro); background: rgba(74,140,63,0.12); color: var(--creme); }
+  .quiz-opt.correct { border-color: #4caf50; background: rgba(76,175,80,0.15); color: #a5d6a7; }
+  .quiz-opt.wrong { border-color: #e57373; background: rgba(229,115,115,0.12); color: #ef9a9a; }
+  .quiz-feedback { font-size: 0.88rem; margin-top: 0.75rem; padding: 0.6rem 1rem; border-radius: 8px; display: none; }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.ok { background: rgba(76,175,80,0.15); color: #a5d6a7; }
+  .quiz-feedback.fail { background: rgba(229,115,115,0.1); color: #ef9a9a; }
+  .btn-next { margin-top: 1rem; background: var(--verde-medio); border: 1px solid var(--verde-claro); color: var(--creme); padding: 0.6rem 1.5rem; border-radius: 25px; cursor: pointer; font-family: 'Lora', serif; font-size: 0.88rem; letter-spacing: 0.05em; transition: all 0.2s; display: none; }
+  .btn-next:hover { background: var(--verde-claro); }
+
+  .progress-bar-wrap { background: rgba(255,255,255,0.06); border-radius: 4px; height: 6px; margin-bottom: 2rem; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--verde-claro), var(--dourado)); border-radius: 4px; transition: width 0.5s ease; width: 0%; }
+
+  .timer-widget {
+    position: fixed; top: 1.5rem; right: 2rem; z-index: 100;
+    background: rgba(26,46,26,0.85); border: 1px solid rgba(200,168,75,0.25);
+    border-radius: 14px; padding: 0.75rem 1.25rem; text-align: center; backdrop-filter: blur(12px);
+  }
+  .timer-display { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--dourado); letter-spacing: 0.05em; }
+  .timer-label { font-size: 0.6rem; color: rgba(245,240,232,0.4); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 0.1rem; }
+  .timer-btns { display: flex; gap: 0.4rem; justify-content: center; margin-top: 0.5rem; }
+  .timer-btns button { background: none; border: 1px solid rgba(245,240,232,0.15); color: rgba(245,240,232,0.5); border-radius: 6px; padding: 0.2rem 0.5rem; font-size: 0.65rem; cursor: pointer; font-family: 'Lora', serif; transition: all 0.2s; }
+  .timer-btns button:hover { border-color: var(--dourado); color: var(--dourado); }
+
+  .quote-banner { text-align: center; padding: 2rem; border-top: 1px solid rgba(200,168,75,0.1); border-bottom: 1px solid rgba(200,168,75,0.1); margin-bottom: 3rem; }
+  .quote-banner blockquote { font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(1rem, 2.5vw, 1.3rem); color: rgba(245,240,232,0.7); max-width: 700px; margin: 0 auto 0.75rem; }
+  .quote-banner cite { font-size: 0.8rem; color: var(--dourado); letter-spacing: 0.15em; text-transform: uppercase; }
+
+  .chat-section { background: rgba(255,255,255,0.03); border: 1px solid rgba(200,168,75,0.2); border-radius: 20px; padding: 2rem; margin-bottom: 3rem; }
+  .chat-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(200,168,75,0.12); }
+  .chat-avatar { width: 42px; height: 42px; background: linear-gradient(135deg, var(--verde-medio), var(--verde-claro)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; box-shadow: 0 0 16px rgba(74,140,63,0.4); animation: breathe 4s ease-in-out infinite; }
+  .chat-header-info h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 600; color: var(--creme); }
+  .chat-header-info p { font-size: 0.72rem; color: rgba(245,240,232,0.45); letter-spacing: 0.1em; text-transform: uppercase; }
+  .chat-online { margin-left: auto; display: flex; align-items: center; gap: 0.4rem; font-size: 0.7rem; color: #6fcf97; letter-spacing: 0.1em; }
+  .chat-online-dot { width: 7px; height: 7px; background: #6fcf97; border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+  .chat-messages { height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.25rem; padding-right: 0.5rem; scrollbar-width: thin; scrollbar-color: rgba(200,168,75,0.2) transparent; }
+  .chat-messages::-webkit-scrollbar { width: 4px; }
+  .chat-messages::-webkit-scrollbar-thumb { background: rgba(200,168,75,0.2); border-radius: 4px; }
+  .msg { display: flex; gap: 0.75rem; animation: fadeIn 0.35s ease; max-width: 88%; }
+  .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+  .msg-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; margin-top: 2px; }
+  .msg.ai .msg-avatar { background: linear-gradient(135deg, var(--verde-medio), var(--verde-claro)); }
+  .msg.user .msg-avatar { background: rgba(200,168,75,0.2); border: 1px solid rgba(200,168,75,0.3); }
+  .msg-bubble { padding: 0.75rem 1rem; border-radius: 14px; font-size: 0.92rem; line-height: 1.65; }
+  .msg.ai .msg-bubble { background: rgba(74,140,63,0.12); border: 1px solid rgba(74,140,63,0.2); color: rgba(245,240,232,0.9); border-top-left-radius: 4px; }
+  .msg.user .msg-bubble { background: rgba(200,168,75,0.12); border: 1px solid rgba(200,168,75,0.2); color: rgba(245,240,232,0.9); border-top-right-radius: 4px; text-align: right; }
+  .msg-bubble strong { color: var(--dourado); }
+  .typing-indicator { display: flex; align-items: center; gap: 5px; padding: 0.6rem 0.9rem; }
+  .typing-dot { width: 7px; height: 7px; background: var(--verde-claro); border-radius: 50%; animation: typingBounce 1.2s ease-in-out infinite; }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typingBounce { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-6px); opacity: 1; } }
+  .chat-input-row { display: flex; gap: 0.75rem; align-items: flex-end; }
+  .chat-input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(200,168,75,0.2); border-radius: 12px; padding: 0.75rem 1rem; color: var(--creme); font-family: 'Lora', serif; font-size: 0.92rem; resize: none; outline: none; transition: border-color 0.2s; min-height: 44px; max-height: 120px; line-height: 1.5; }
+  .chat-input::placeholder { color: rgba(245,240,232,0.3); }
+  .chat-input:focus { border-color: rgba(200,168,75,0.5); }
+  .chat-send-btn { background: var(--verde-medio); border: 1px solid var(--verde-claro); color: var(--creme); width: 44px; height: 44px; border-radius: 12px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+  .chat-send-btn:hover:not(:disabled) { background: var(--verde-claro); transform: scale(1.05); }
+  .chat-send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .chat-suggestions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+  .chat-suggestion { background: rgba(74,140,63,0.1); border: 1px solid rgba(74,140,63,0.25); border-radius: 20px; padding: 0.3rem 0.85rem; font-size: 0.78rem; color: rgba(245,240,232,0.7); cursor: pointer; font-family: 'Lora', serif; transition: all 0.2s; }
+  .chat-suggestion:hover { background: rgba(74,140,63,0.2); border-color: var(--verde-claro); color: var(--creme); }
+
+  .prova-section { background: rgba(255,255,255,0.03); border: 1px solid rgba(200,168,75,0.2); border-radius: 20px; padding: 2rem; margin-bottom: 3rem; }
+  .prova-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(200,168,75,0.12); }
+  .prova-icon-box { width: 42px; height: 42px; background: linear-gradient(135deg, #7b4a1e, #c8a84b); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; box-shadow: 0 0 16px rgba(200,168,75,0.3); }
+  .prova-header-info h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 600; color: var(--creme); }
+  .prova-header-info p { font-size: 0.72rem; color: rgba(245,240,232,0.45); letter-spacing: 0.1em; text-transform: uppercase; }
+  .prova-config { display: block; }
+  .prova-config-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .prova-config-item label { display: block; font-size: 0.75rem; color: var(--dourado); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.4rem; }
+  .prova-select { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(200,168,75,0.25); border-radius: 10px; padding: 0.65rem 1rem; color: var(--creme); font-family: 'Lora', serif; font-size: 0.92rem; outline: none; transition: border-color 0.2s; cursor: pointer; }
+  .prova-select option { background: #1a2e1a; }
+  .prova-select:focus { border-color: rgba(200,168,75,0.6); }
+  .btn-iniciar-prova { width: 100%; background: linear-gradient(135deg, var(--verde-medio), var(--verde-claro)); border: none; border-radius: 12px; padding: 0.9rem; color: var(--creme); font-family: 'Playfair Display', serif; font-size: 1rem; font-style: italic; cursor: pointer; transition: all 0.3s; letter-spacing: 0.05em; box-shadow: 0 4px 20px rgba(74,140,63,0.3); }
+  .btn-iniciar-prova:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(74,140,63,0.5); }
+  .btn-iniciar-prova:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .prova-andamento { display: none; }
+  .prova-topo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(200,168,75,0.1); flex-wrap: wrap; gap: 0.5rem; }
+  .prova-info-top { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .prova-badge { background: rgba(200,168,75,0.15); border: 1px solid rgba(200,168,75,0.3); border-radius: 20px; padding: 0.3rem 0.85rem; font-size: 0.78rem; color: var(--dourado); letter-spacing: 0.05em; }
+  .prova-timer-display { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--creme); letter-spacing: 0.05em; min-width: 60px; text-align: right; }
+  .prova-timer-display.urgente { color: #e57373; animation: blink 1s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .prova-progress-wrap { background: rgba(255,255,255,0.06); border-radius: 4px; height: 5px; margin-bottom: 1.5rem; overflow: hidden; }
+  .prova-progress-fill { height: 100%; background: linear-gradient(90deg, var(--dourado), var(--verde-claro)); border-radius: 4px; transition: width 0.4s ease; }
+  .questao-numero { font-size: 0.72rem; color: rgba(245,240,232,0.45); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .questao-enunciado { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--creme); line-height: 1.6; margin-bottom: 1.25rem; }
+  .questao-opcoes { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.25rem; }
+  .opcao-btn { background: rgba(255,255,255,0.04); border: 1px solid rgba(245,240,232,0.12); border-radius: 12px; padding: 0.8rem 1.1rem; cursor: pointer; font-family: 'Lora', serif; font-size: 0.9rem; color: rgba(245,240,232,0.8); text-align: left; transition: all 0.2s; display: flex; align-items: flex-start; gap: 0.75rem; }
+  .opcao-letra { background: rgba(200,168,75,0.15); border: 1px solid rgba(200,168,75,0.25); border-radius: 6px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; color: var(--dourado); flex-shrink: 0; transition: all 0.2s; }
+  .opcao-btn:hover:not(:disabled) { border-color: rgba(200,168,75,0.4); background: rgba(200,168,75,0.06); color: var(--creme); }
+  .opcao-btn:hover:not(:disabled) .opcao-letra { background: rgba(200,168,75,0.3); }
+  .opcao-btn.selecionada { border-color: var(--dourado); background: rgba(200,168,75,0.1); color: var(--creme); }
+  .opcao-btn.selecionada .opcao-letra { background: var(--dourado); color: #1a2e1a; }
+  .prova-nav { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .btn-prova-nav { background: rgba(255,255,255,0.05); border: 1px solid rgba(245,240,232,0.15); border-radius: 10px; padding: 0.6rem 1.25rem; color: rgba(245,240,232,0.7); font-family: 'Lora', serif; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; }
+  .btn-prova-nav:hover:not(:disabled) { border-color: var(--verde-claro); color: var(--creme); }
+  .btn-prova-nav:disabled { opacity: 0.3; cursor: not-allowed; }
+  .btn-entregar { background: linear-gradient(135deg, #7b4a1e, #c8a84b); border: none; border-radius: 10px; padding: 0.6rem 1.5rem; color: var(--creme); font-family: 'Lora', serif; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; font-weight: 500; }
+  .btn-entregar:hover { transform: scale(1.03); box-shadow: 0 4px 16px rgba(200,168,75,0.3); }
+  .questao-mapa { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(200,168,75,0.1); }
+  .mapa-item { width: 30px; height: 30px; border-radius: 6px; border: 1px solid rgba(245,240,232,0.15); display: flex; align-items: center; justify-content: center; font-size: 0.72rem; cursor: pointer; transition: all 0.2s; color: rgba(245,240,232,0.5); }
+  .mapa-item.respondida { background: rgba(74,140,63,0.2); border-color: var(--verde-claro); color: var(--verde-claro); }
+  .mapa-item.atual { border-color: var(--dourado); color: var(--dourado); }
+  .prova-resultado { display: none; text-align: center; }
+  .resultado-nota { font-family: 'Playfair Display', serif; font-size: 5rem; font-weight: 600; line-height: 1; margin: 1rem 0 0.25rem; }
+  .resultado-nota.excelente { color: #66bb6a; }
+  .resultado-nota.bom { color: var(--dourado); }
+  .resultado-nota.regular { color: #ffa726; }
+  .resultado-nota.ruim { color: #ef5350; }
+  .resultado-label { font-size: 0.8rem; color: rgba(245,240,232,0.5); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .resultado-msg { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.1rem; color: rgba(245,240,232,0.7); margin-bottom: 1.5rem; }
+  .resultado-stats { display: flex; justify-content: center; gap: 2rem; margin-bottom: 2rem; flex-wrap: wrap; }
+  .stat-item { text-align: center; }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--creme); }
+  .stat-label { font-size: 0.7rem; color: rgba(245,240,232,0.4); text-transform: uppercase; letter-spacing: 0.1em; }
+  .gabarito-lista { text-align: left; margin-bottom: 1.5rem; }
+  .gabarito-item { border: 1px solid rgba(245,240,232,0.08); border-radius: 12px; padding: 1rem; margin-bottom: 0.75rem; font-size: 0.88rem; line-height: 1.5; }
+  .gabarito-item.acerto { border-color: rgba(76,175,80,0.3); background: rgba(76,175,80,0.05); }
+  .gabarito-item.erro { border-color: rgba(239,83,80,0.3); background: rgba(239,83,80,0.05); }
+  .gabarito-enunciado { color: rgba(245,240,232,0.8); margin-bottom: 0.5rem; }
+  .gabarito-resposta { display: flex; gap: 0.4rem; align-items: flex-start; flex-wrap: wrap; }
+  .gabarito-tag { font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 4px; font-weight: 600; letter-spacing: 0.05em; flex-shrink: 0; margin-top: 2px; }
+  .tag-correta { background: rgba(76,175,80,0.2); color: #a5d6a7; }
+  .tag-sua { background: rgba(239,83,80,0.2); color: #ef9a9a; }
+  .tag-acerto { background: rgba(76,175,80,0.2); color: #a5d6a7; }
+  .gabarito-explicacao { margin-top: 0.5rem; font-size: 0.82rem; color: rgba(245,240,232,0.55); font-style: italic; padding-top: 0.5rem; border-top: 1px solid rgba(245,240,232,0.06); }
+  .btn-nova-prova { background: linear-gradient(135deg, var(--verde-medio), var(--verde-claro)); border: none; border-radius: 12px; padding: 0.85rem 2rem; color: var(--creme); font-family: 'Playfair Display', serif; font-size: 1rem; font-style: italic; cursor: pointer; transition: all 0.3s; letter-spacing: 0.05em; }
+  .btn-nova-prova:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(74,140,63,0.4); }
+  .prova-loading { display: none; text-align: center; padding: 3rem 1rem; }
+  .prova-loading-icon { font-size: 3rem; animation: spin 2s linear infinite; display: block; margin-bottom: 1rem; }
+  @keyframes spin { 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
+  .prova-loading p { color: rgba(245,240,232,0.6); font-style: italic; }
+
+  .topicos-section { background: rgba(255,255,255,0.03); border: 1px solid rgba(200,168,75,0.15); border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; }
+  .topicos-toggle { display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
+  .topicos-toggle-label { font-size: 0.78rem; color: var(--dourado); letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: 0.5rem; }
+  .topicos-toggle-arrow { font-size: 0.7rem; color: rgba(245,240,232,0.4); transition: transform 0.3s; }
+  .topicos-toggle-arrow.open { transform: rotate(180deg); }
+  .topicos-body { display: none; margin-top: 1rem; }
+  .topicos-body.open { display: block; animation: fadeIn 0.3s ease; }
+  .topicos-hint { font-size: 0.78rem; color: rgba(245,240,232,0.45); margin-bottom: 0.85rem; font-style: italic; }
+  .topicos-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem; }
+  .topico-chip { background: rgba(255,255,255,0.04); border: 1px solid rgba(245,240,232,0.15); border-radius: 20px; padding: 0.3rem 0.8rem; font-size: 0.78rem; color: rgba(245,240,232,0.6); cursor: pointer; font-family: 'Lora', serif; transition: all 0.2s; user-select: none; }
+  .topico-chip:hover { border-color: rgba(200,168,75,0.4); color: var(--creme); }
+  .topico-chip.ativo { background: rgba(200,168,75,0.15); border-color: var(--dourado); color: var(--dourado); }
+  .topico-chip.ativo::before { content: '✓ '; }
+  .topicos-custom { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+  .topico-input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(200,168,75,0.2); border-radius: 8px; padding: 0.5rem 0.85rem; color: var(--creme); font-family: 'Lora', serif; font-size: 0.82rem; outline: none; }
+  .topico-input::placeholder { color: rgba(245,240,232,0.3); }
+  .topico-input:focus { border-color: rgba(200,168,75,0.5); }
+  .btn-add-topico { background: rgba(200,168,75,0.15); border: 1px solid rgba(200,168,75,0.3); border-radius: 8px; padding: 0.5rem 0.85rem; color: var(--dourado); font-size: 0.85rem; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+  .btn-add-topico:hover { background: rgba(200,168,75,0.25); }
+  .topicos-selecionados-count { font-size: 0.72rem; color: rgba(245,240,232,0.4); margin-top: 0.5rem; }
+
+  .registro-section { background: rgba(255,255,255,0.03); border: 1px solid rgba(200,168,75,0.2); border-radius: 20px; padding: 2rem; margin-bottom: 3rem; }
+  .registro-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(200,168,75,0.12); flex-wrap: wrap; }
+  .registro-icon-box { width: 42px; height: 42px; background: linear-gradient(135deg, #1a3a4a, #2d7a8a); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; box-shadow: 0 0 16px rgba(45,122,138,0.3); }
+  .registro-header-info h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 600; color: var(--creme); }
+  .registro-header-info p { font-size: 0.72rem; color: rgba(245,240,232,0.45); letter-spacing: 0.1em; text-transform: uppercase; }
+  .registro-stats-bar { margin-left: auto; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .reg-stat { text-align: center; }
+  .reg-stat-num { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--creme); display: block; }
+  .reg-stat-label { font-size: 0.62rem; color: rgba(245,240,232,0.4); text-transform: uppercase; letter-spacing: 0.1em; }
+  .registro-vazio { text-align: center; padding: 3rem 1rem; color: rgba(245,240,232,0.35); font-style: italic; font-size: 0.92rem; }
+  .registro-vazio-icon { font-size: 2.5rem; display: block; margin-bottom: 0.75rem; opacity: 0.4; }
+  .registro-lista { display: flex; flex-direction: column; gap: 0.75rem; }
+  .registro-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(245,240,232,0.07); border-radius: 14px; padding: 1rem 1.25rem; display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 1rem; transition: border-color 0.2s; cursor: pointer; }
+  .registro-item:hover { border-color: rgba(200,168,75,0.25); }
+  .reg-nota-circulo { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 600; flex-shrink: 0; border: 2px solid; }
+  .reg-nota-circulo.excelente { border-color: #66bb6a; color: #66bb6a; background: rgba(102,187,106,0.1); }
+  .reg-nota-circulo.bom { border-color: var(--dourado); color: var(--dourado); background: rgba(200,168,75,0.1); }
+  .reg-nota-circulo.regular { border-color: #ffa726; color: #ffa726; background: rgba(255,167,38,0.1); }
+  .reg-nota-circulo.ruim { border-color: #ef5350; color: #ef5350; background: rgba(239,83,80,0.1); }
+  .reg-info { min-width: 0; }
+  .reg-titulo { font-family: 'Playfair Display', serif; font-size: 0.95rem; color: var(--creme); margin-bottom: 0.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .reg-sub { font-size: 0.72rem; color: rgba(245,240,232,0.45); display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .reg-acertos { font-size: 0.8rem; color: rgba(245,240,232,0.6); text-align: right; flex-shrink: 0; }
+  .reg-data { font-size: 0.68rem; color: rgba(245,240,232,0.3); text-align: right; flex-shrink: 0; min-width: 60px; }
+  .registro-filtros { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+  .filtro-btn { background: rgba(255,255,255,0.04); border: 1px solid rgba(245,240,232,0.12); border-radius: 20px; padding: 0.25rem 0.75rem; font-size: 0.75rem; color: rgba(245,240,232,0.5); cursor: pointer; font-family: 'Lora', serif; transition: all 0.2s; }
+  .filtro-btn:hover, .filtro-btn.ativo { border-color: var(--dourado); color: var(--dourado); background: rgba(200,168,75,0.08); }
+  .btn-limpar-registro { margin-left: auto; background: none; border: 1px solid rgba(239,83,80,0.3); border-radius: 8px; padding: 0.3rem 0.75rem; color: rgba(239,83,80,0.6); font-size: 0.72rem; cursor: pointer; font-family: 'Lora', serif; transition: all 0.2s; }
+  .btn-limpar-registro:hover { border-color: #ef5350; color: #ef5350; }
+  .grafico-bar-wrap { margin-bottom: 1.5rem; }
+  .grafico-bar-label { font-size: 0.7rem; color: rgba(245,240,232,0.4); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .grafico-bars { display: flex; align-items: flex-end; gap: 4px; height: 60px; background: rgba(255,255,255,0.03); border-radius: 8px; padding: 8px; border: 1px solid rgba(245,240,232,0.05); }
+  .grafico-bar-item { flex: 1; border-radius: 3px 3px 0 0; min-height: 4px; transition: height 0.5s ease; cursor: pointer; position: relative; }
+  .grafico-bar-item:hover::after { content: attr(data-tip); position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%); background: rgba(26,46,26,0.95); border: 1px solid rgba(200,168,75,0.3); color: var(--creme); font-size: 0.65rem; padding: 0.2rem 0.4rem; border-radius: 4px; white-space: nowrap; z-index: 10; font-family: 'Lora', serif; }
+
+  @media (max-width: 600px) {
+    .timer-widget { top: auto; bottom: 6rem; right: 1rem; }
+    .music-player { bottom: 1rem; right: 1rem; left: 1rem; justify-content: space-between; }
+    header { padding: 2rem 1rem 1.5rem; }
+    main { padding: 2rem 1rem 10rem; }
+    .study-area { padding: 1.5rem; }
+    .chat-messages { height: 250px; }
+    .resultado-nota { font-size: 3.5rem; }
+    .resultado-stats { gap: 1rem; }
+    .registro-item { grid-template-columns: auto 1fr auto; }
+    .reg-data { display: none; }
+    .registro-stats-bar { margin-left: 0; width: 100%; justify-content: space-around; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-canvas"></div>
+<div id="leaves-container"></div>
+
+<div class="timer-widget">
+  <div class="timer-display" id="timerDisplay">25:00</div>
+  <div class="timer-label">Foco 🍃</div>
+  <div class="timer-btns">
+    <button onclick="startTimer()">▶</button>
+    <button onclick="pauseTimer()">⏸</button>
+    <button onclick="resetTimer()">↺</button>
+  </div>
+</div>
+
+<header>
+  <span class="logo-icon">🌿</span>
+  <h1>Jardim do <span>Saber</span></h1>
+  <p class="subtitle">Estude todas as matérias em um lugar tranquilo</p>
+</header>
+
+<main>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar"></div></div>
+
+  <div class="quote-banner">
+    <blockquote id="quoteText">"Na natureza não há nada de errado, tudo é aprendizado constante."</blockquote>
+    <cite id="quoteAuthor">— Henry Thoreau</cite>
+  </div>
+
+  <p class="section-title">📚 Escolha uma matéria para estudar</p>
+  <div class="topics-grid">
+    <div class="topic-card" onclick="showTopic('floresta')"><span class="topic-icon">🔬</span><h3>Ciências & Biologia</h3><p>Florestas, oceanos, ecossistemas, células, genética, evolução e o mundo vivo ao nosso redor.</p><span class="topic-tag">Ciências</span></div>
+    <div class="topic-card" onclick="showTopic('oceano')"><span class="topic-icon">➗</span><h3>Matemática</h3><p>Aritmética, álgebra, geometria, funções, estatística, cálculo e raciocínio lógico.</p><span class="topic-tag">Exatas</span></div>
+    <div class="topic-card" onclick="showTopic('ciclo')"><span class="topic-icon">📖</span><h3>Português & Literatura</h3><p>Gramática, interpretação de texto, redação, literatura brasileira e mundial.</p><span class="topic-tag">Linguagens</span></div>
+    <div class="topic-card" onclick="showTopic('fauna')"><span class="topic-icon">🌍</span><h3>História & Geografia</h3><p>Civilizações, guerras, revoluções, mapas, geopolítica e transformações do mundo.</p><span class="topic-tag">Humanas</span></div>
+    <div class="topic-card" onclick="showTopic('clima')"><span class="topic-icon">⚗️</span><h3>Química & Física</h3><p>Átomos, reações, forças, energia, eletricidade, termodinâmica e muito mais.</p><span class="topic-tag">Exatas</span></div>
+    <div class="topic-card" onclick="showTopic('plantas')"><span class="topic-icon">🌐</span><h3>Inglês & Idiomas</h3><p>Gramática, vocabulário, interpretação, verbos, pronúncia e comunicação em inglês.</p><span class="topic-tag">Linguagens</span></div>
+  </div>
+
+  <div class="study-area" id="studyArea" style="display:none">
+    <h2 id="studyTitle">🔬 Ciências & Biologia</h2>
+
+    <div class="content-block active" id="topic-floresta">
+      <p>As florestas cobrem aproximadamente <strong style="color:var(--dourado)">31% da superfície terrestre</strong> e são responsáveis por absorver cerca de 2,6 bilhões de toneladas de CO₂ por ano.</p>
+      <div class="fact-box">🌿 A Floresta Amazônica sozinha abriga mais de 10% de todas as espécies de vida selvagem do mundo e produz 20% do oxigênio da Terra.</div>
+      <h4>Camadas da Floresta</h4>
+      <p>Uma floresta tropical típica possui quatro camadas distintas: o dossel emergente (25–45m), o dossel principal (15–30m), o sub-bosque (5–15m) e o chão florestal.</p>
+      <h4>Importância Ecológica</h4>
+      <p>Além de regular o clima, as florestas protegem nascentes d'água, previnem erosão do solo e fornecem recursos medicinais ainda pouco explorados pela ciência moderna.</p>
+      <div class="fact-box">🔬 Mais de 25% dos medicamentos modernos derivam de plantas florestais.</div>
+      <div class="quiz-section">
+        <h3>🎯 Teste seus conhecimentos</h3>
+        <div class="quiz-question visible" id="q-floresta-1">
+          <p>Qual porcentagem da superfície terrestre as florestas cobrem?</p>
+          <div class="quiz-options">
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-floresta-1','q-floresta-2')">15%</button>
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-floresta-1','q-floresta-2')">22%</button>
+            <button class="quiz-opt" onclick="answer(this,'correct','q-floresta-1','q-floresta-2')">31%</button>
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-floresta-1','q-floresta-2')">45%</button>
+          </div>
+          <div class="quiz-feedback" id="fb-floresta-1"></div>
+          <button class="btn-next" id="next-floresta-1" onclick="nextQ('q-floresta-1','q-floresta-2')">Próxima →</button>
+        </div>
+        <div class="quiz-question" id="q-floresta-2">
+          <p>Quantas camadas possui uma floresta tropical típica?</p>
+          <div class="quiz-options">
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-floresta-2',null)">2</button>
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-floresta-2',null)">3</button>
+            <button class="quiz-opt" onclick="answer(this,'correct','q-floresta-2',null)">4</button>
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-floresta-2',null)">6</button>
+          </div>
+          <div class="quiz-feedback" id="fb-floresta-2"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-block" id="topic-oceano">
+      <p>Os oceanos cobrem <strong style="color:var(--dourado)">71% da superfície do planeta</strong> e contêm 97% de toda a água da Terra.</p>
+      <div class="fact-box">🐋 O oceano profundo é o maior habitat do planeta — estimamos que conhecemos menos de 20% de suas profundezas.</div>
+      <h4>Zonas Oceânicas</h4>
+      <p>O oceano é dividido em zonas verticais: zona fótica (até 200m), zona mesopelágica (200–1000m), zona batipelágica (1000–4000m) e zona abissal (abaixo de 4000m).</p>
+      <h4>Recifes de Coral</h4>
+      <p>Apesar de cobrirem menos de 1% do oceano, os recifes de coral abrigam mais de 25% de todas as espécies marinhas.</p>
+      <div class="quiz-section">
+        <h3>🎯 Teste seus conhecimentos</h3>
+        <div class="quiz-question visible" id="q-oceano-1">
+          <p>Qual porcentagem da água da Terra está nos oceanos?</p>
+          <div class="quiz-options">
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-oceano-1','q-oceano-2')">71%</button>
+            <button class="quiz-opt" onclick="answer(this,'correct','q-oceano-1','q-oceano-2')">97%</button>
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-oceano-1','q-oceano-2')">85%</button>
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-oceano-1','q-oceano-2')">60%</button>
+          </div>
+          <div class="quiz-feedback" id="fb-oceano-1"></div>
+          <button class="btn-next" id="next-oceano-1" onclick="nextQ('q-oceano-1','q-oceano-2')">Próxima →</button>
+        </div>
+        <div class="quiz-question" id="q-oceano-2">
+          <p>Os recifes de coral abrigam qual porcentagem das espécies marinhas?</p>
+          <div class="quiz-options">
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-oceano-2',null)">5%</button>
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-oceano-2',null)">10%</button>
+            <button class="quiz-opt" onclick="answer(this,'correct','q-oceano-2',null)">25%</button>
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-oceano-2',null)">50%</button>
+          </div>
+          <div class="quiz-feedback" id="fb-oceano-2"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-block" id="topic-ciclo">
+      <p>O ciclo hidrológico é o movimento contínuo da água entre a atmosfera, a superfície terrestre e o subsolo.</p>
+      <div class="fact-box">💧 A água que você bebe hoje pode ter passado pelos dinossauros — a mesma água, sempre em movimento.</div>
+      <h4>As Etapas do Ciclo</h4>
+      <p><strong style="color:var(--verde-claro)">Evaporação:</strong> O calor solar transforma a água em vapor. <strong style="color:var(--verde-claro)">Condensação:</strong> O vapor forma nuvens. <strong style="color:var(--verde-claro)">Precipitação:</strong> Cai como chuva ou neve. <strong style="color:var(--verde-claro)">Infiltração:</strong> A água penetra no solo e reabastece os lençóis freáticos.</p>
+      <div class="quiz-section">
+        <h3>🎯 Teste seus conhecimentos</h3>
+        <div class="quiz-question visible" id="q-ciclo-1">
+          <p>Como se chama o processo pelo qual as plantas liberam vapor d'água?</p>
+          <div class="quiz-options">
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-ciclo-1',null)">Fotossíntese</button>
+            <button class="quiz-opt" onclick="answer(this,'correct','q-ciclo-1',null)">Transpiração / Evapotranspiração</button>
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-ciclo-1',null)">Respiração celular</button>
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-ciclo-1',null)">Osmose</button>
+          </div>
+          <div class="quiz-feedback" id="fb-ciclo-1"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-block" id="topic-fauna">
+      <p>O planeta abriga entre <strong style="color:var(--dourado)">8 e 10 milhões de espécies</strong> de animais, mas a ciência catalogou apenas cerca de 1,5 milhão delas.</p>
+      <div class="fact-box">🦋 Remover qualquer elo da cadeia alimentar pode desestabilizar todo o ecossistema — como o colapso de um castelo de cartas.</div>
+      <h4>Adaptações Fascinantes</h4>
+      <p>O polvo muda de cor em milissegundos. O urso polar tem pelos ocos que capturam calor solar. A tartaruga-do-deserto pode passar anos sem beber água.</p>
+      <h4>Migração Animal</h4>
+      <p>O andorinho-do-ártico viaja mais de 70.000 km por ano, da Groenlândia à Antártica e de volta.</p>
+      <div class="quiz-section">
+        <h3>🎯 Teste seus conhecimentos</h3>
+        <div class="quiz-question visible" id="q-fauna-1">
+          <p>Qual ave realiza a maior migração anual do planeta?</p>
+          <div class="quiz-options">
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-fauna-1',null)">Pombo-correio</button>
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-fauna-1',null)">Cegonha branca</button>
+            <button class="quiz-opt" onclick="answer(this,'correct','q-fauna-1',null)">Andorinho-do-ártico</button>
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-fauna-1',null)">Albatroz</button>
+          </div>
+          <div class="quiz-feedback" id="fb-fauna-1"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-block" id="topic-clima">
+      <p>Sem a atmosfera, a temperatura média na superfície seria de -18°C em vez dos atuais +15°C.</p>
+      <div class="fact-box">🌡️ O ciclo do carbono conecta plantas, animais, oceanos e a atmosfera. Quando o equilíbrio é rompido, o planeta inteiro responde.</div>
+      <h4>O Efeito Estufa Natural</h4>
+      <p>Gases como CO₂, vapor d'água e metano retêm o calor solar — processo natural e essencial. O problema é a intensificação humana desse processo.</p>
+      <h4>Mudanças Climáticas</h4>
+      <p>Desde a Revolução Industrial, a temperatura global subiu cerca de 1,1°C, aumentando a frequência de eventos extremos.</p>
+      <div class="quiz-section">
+        <h3>🎯 Teste seus conhecimentos</h3>
+        <div class="quiz-question visible" id="q-clima-1">
+          <p>Sem o efeito estufa natural, qual seria a temperatura média na Terra?</p>
+          <div class="quiz-options">
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-clima-1',null)">+5°C</button>
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-clima-1',null)">0°C</button>
+            <button class="quiz-opt" onclick="answer(this,'correct','q-clima-1',null)">-18°C</button>
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-clima-1',null)">-35°C</button>
+          </div>
+          <div class="quiz-feedback" id="fb-clima-1"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-block" id="topic-plantas">
+      <p>As plantas produzem seu alimento através da <strong style="color:var(--dourado)">fotossíntese</strong> — convertendo luz solar, CO₂ e água em glicose e oxigênio.</p>
+      <div class="fact-box">🌺 Existem mais de 390.000 espécies de plantas conhecidas. O Pinheiro-de-Bristlecone mais antigo tem mais de 5.000 anos.</div>
+      <h4>A Fotossíntese</h4>
+      <p>Equação simplificada: <em style="color:var(--verde-claro)">CO₂ + H₂O + Luz → C₆H₁₂O₆ + O₂</em>. A clorofila nas cloroplastas captura a energia luminosa.</p>
+      <h4>Polinização</h4>
+      <p>75% das plantas com flores dependem de polinizadores. As abelhas são responsáveis pela polinização de 1/3 de toda a comida que consumimos.</p>
+      <div class="quiz-section">
+        <h3>🎯 Teste seus conhecimentos</h3>
+        <div class="quiz-question visible" id="q-plantas-1">
+          <p>Qual pigmento vegetal captura a energia luminosa na fotossíntese?</p>
+          <div class="quiz-options">
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-plantas-1',null)">Melanina</button>
+            <button class="quiz-opt" onclick="answer(this,'correct','q-plantas-1',null)">Clorofila</button>
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-plantas-1',null)">Caroteno</button>
+            <button class="quiz-opt" onclick="answer(this,'wrong','q-plantas-1',null)">Hemoglobina</button>
+          </div>
+          <div class="quiz-feedback" id="fb-plantas-1"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEÇÃO DE PROVA -->
+  <div class="prova-section">
+    <div class="prova-header">
+      <div class="prova-icon-box">📝</div>
+      <div class="prova-header-info"><h3>Modo Prova</h3><p>Questões geradas por IA com correção automática</p></div>
+    </div>
+
+    <div class="prova-config" id="provaConfig">
+      <div class="prova-config-grid">
+        <div class="prova-config-item">
+          <label>📚 Matéria</label>
+          <select class="prova-select" id="provaMateria">
+            <option value="matematica">➗ Matemática</option>
+            <option value="portugues">📖 Português</option>
+            <option value="historia">🌍 História</option>
+            <option value="geografia">🗺️ Geografia</option>
+            <option value="biologia">🔬 Biologia</option>
+            <option value="quimica">⚗️ Química</option>
+            <option value="fisica">⚡ Física</option>
+            <option value="ingles">🌐 Inglês</option>
+            <option value="literatura">📚 Literatura</option>
+            <option value="filosofia">🧠 Filosofia</option>
+            <option value="mista">🎲 Mista</option>
+          </select>
+        </div>
+        <div class="prova-config-item">
+          <label>🎓 Série / Nível</label>
+          <select class="prova-select" id="provaSerie">
+            <optgroup label="📘 Ensino Fundamental I">
+              <option value="1ano_ef">1º Ano</option><option value="2ano_ef">2º Ano</option><option value="3ano_ef">3º Ano</option><option value="4ano_ef">4º Ano</option><option value="5ano_ef">5º Ano</option>
+            </optgroup>
+            <optgroup label="📗 Ensino Fundamental II">
+              <option value="6ano_ef">6º Ano</option><option value="7ano_ef">7º Ano</option><option value="8ano_ef">8º Ano</option><option value="9ano_ef" selected>9º Ano</option>
+            </optgroup>
+            <optgroup label="📕 Ensino Médio">
+              <option value="1ano_em">1º Ano EM</option><option value="2ano_em">2º Ano EM</option><option value="3ano_em">3º Ano EM</option>
+            </optgroup>
+            <optgroup label="🏛️ Vestibular / ENEM">
+              <option value="enem">ENEM</option><option value="vestibular">Vestibular</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="prova-config-item">
+          <label>🎯 Dificuldade</label>
+          <select class="prova-select" id="provaDificuldade">
+            <option value="facil">🌱 Fácil</option><option value="medio" selected>🌿 Médio</option><option value="dificil">🌳 Difícil</option>
+          </select>
+        </div>
+        <div class="prova-config-item">
+          <label>🔢 Questões</label>
+          <select class="prova-select" id="provaQtd">
+            <option value="5">5 questões</option><option value="10" selected>10 questões</option><option value="15">15 questões</option><option value="20">20 questões</option>
+          </select>
+        </div>
+        <div class="prova-config-item">
+          <label>⏱️ Tempo</label>
+          <select class="prova-select" id="provaTempo">
+            <option value="0">Sem limite</option><option value="10">10 min</option><option value="20">20 min</option><option value="30" selected>30 min</option><option value="60">60 min</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="topicos-section">
+        <div class="topicos-toggle" onclick="toggleTopicos()">
+          <span class="topicos-toggle-label">🎯 Escolher tópicos <span style="font-size:0.68rem;color:rgba(245,240,232,0.35);text-transform:none;letter-spacing:0">(opcional)</span></span>
+          <span class="topicos-toggle-arrow" id="topicosArrow">▼</span>
+        </div>
+        <div class="topicos-body" id="topicosBody">
+          <p class="topicos-hint">Selecione os tópicos que podem aparecer. Se nenhum for selecionado, a IA variará livremente.</p>
+          <div class="topicos-chips" id="topicosChips"></div>
+          <div class="topicos-custom">
+            <input type="text" class="topico-input" id="topicoInput" placeholder="Adicionar tópico personalizado..." onkeydown="if(event.key==='Enter')adicionarTopicoCustom()">
+            <button class="btn-add-topico" onclick="adicionarTopicoCustom()">+ Adicionar</button>
+          </div>
+          <div class="topicos-selecionados-count" id="topicosSelecionadosCount"></div>
+        </div>
+      </div>
+
+      <button class="btn-iniciar-prova" id="btnIniciarProva" onclick="iniciarProva()">📝 Gerar e Iniciar Prova</button>
+    </div>
+
+    <div class="prova-loading" id="provaLoading">
+      <span class="prova-loading-icon">🌿</span>
+      <p>Gerando suas questões com IA...<br><small style="opacity:0.5">Isso pode levar alguns segundos</small></p>
+    </div>
+
+    <div class="prova-andamento" id="provaAndamento">
+      <div class="prova-topo">
+        <div class="prova-info-top">
+          <span class="prova-badge" id="provaBadgeMateria">Matéria</span>
+          <span class="prova-badge" id="provaBadgeSerie">Série</span>
+          <span class="prova-badge" id="provaBadgeDif">Dificuldade</span>
+          <span style="font-size:0.8rem;color:rgba(245,240,232,0.5)" id="provaContador">Questão 1 de 10</span>
+        </div>
+        <div class="prova-timer-display" id="provaTimerDisplay" style="display:none">30:00</div>
+      </div>
+      <div class="prova-progress-wrap"><div class="prova-progress-fill" id="provaProgressFill" style="width:0%"></div></div>
+      <div class="questao-wrap">
+        <div class="questao-numero" id="questaoNumero">Questão 1</div>
+        <div class="questao-enunciado" id="questaoEnunciado">Carregando...</div>
+        <div class="questao-opcoes" id="questaoOpcoes"></div>
+        <div class="prova-nav">
+          <button class="btn-prova-nav" id="btnAnterior" onclick="questaoAnterior()" disabled>← Anterior</button>
+          <button class="btn-prova-nav" id="btnProxima" onclick="questaoProxima()">Próxima →</button>
+          <button class="btn-entregar" id="btnEntregar" onclick="entregarProva()" style="display:none">Entregar Prova ✓</button>
+        </div>
+      </div>
+      <div class="questao-mapa" id="questaoMapa"></div>
+    </div>
+
+    <div class="prova-resultado" id="provaResultado">
+      <div class="resultado-label">Sua nota</div>
+      <div class="resultado-nota" id="resultadoNota">0.0</div>
+      <div class="resultado-msg" id="resultadoMsg">Parabéns!</div>
+      <div class="resultado-stats">
+        <div class="stat-item"><div class="stat-num" id="statAcertos">0</div><div class="stat-label">Acertos</div></div>
+        <div class="stat-item"><div class="stat-num" id="statErros">0</div><div class="stat-label">Erros</div></div>
+        <div class="stat-item"><div class="stat-num" id="statTempo">--</div><div class="stat-label">Tempo</div></div>
+      </div>
+      <div class="gabarito-lista" id="gabaritoLista"></div>
+      <button class="btn-nova-prova" onclick="novaProva()">🌱 Fazer Nova Prova</button>
+    </div>
+  </div>
+
+  <!-- CHAT COM IA -->
+  <div class="chat-section">
+    <div class="chat-header">
+      <div class="chat-avatar">🌿</div>
+      <div class="chat-header-info"><h3>Professor Raiz</h3><p>Assistente de Estudos — Todas as Matérias</p></div>
+      <div class="chat-online"><div class="chat-online-dot"></div>online</div>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="msg ai">
+        <div class="msg-avatar">🌿</div>
+        <div class="msg-bubble">Olá! Sou o <strong>Professor Raiz</strong> 🌱<br>Estou aqui para te ajudar em <strong>todas as matérias</strong> — Matemática, Português, História, Física, Química, Biologia, Inglês e muito mais!<br><br>É só perguntar. Como posso te ajudar hoje?</div>
+      </div>
+    </div>
+    <div class="chat-suggestions" id="chatSuggestions">
+      <button class="chat-suggestion" onclick="sendSuggestion(this)">➗ O que é uma equação do 2º grau?</button>
+      <button class="chat-suggestion" onclick="sendSuggestion(this)">📖 O que é sujeito oculto?</button>
+      <button class="chat-suggestion" onclick="sendSuggestion(this)">🌍 O que foi a Revolução Francesa?</button>
+      <button class="chat-suggestion" onclick="sendSuggestion(this)">⚗️ O que são ligações químicas?</button>
+      <button class="chat-suggestion" onclick="sendSuggestion(this)">🔬 O que é fotossíntese?</button>
+      <button class="chat-suggestion" onclick="sendSuggestion(this)">🌐 Diferença entre "since" e "for"?</button>
+      <button class="chat-suggestion" onclick="sendSuggestion(this)">⚡ O que é força elétrica?</button>
+    </div>
+    <div class="chat-input-row">
+      <textarea class="chat-input" id="chatInput" placeholder="Pergunte qualquer coisa..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="chat-send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+
+  <!-- REGISTRO DE PROVAS -->
+  <div class="registro-section">
+    <div class="registro-header">
+      <div class="registro-icon-box">📊</div>
+      <div class="registro-header-info"><h3>Registro de Provas</h3><p>Histórico e desempenho</p></div>
+      <div class="registro-stats-bar" id="registroStatsBar">
+        <div class="reg-stat"><span class="reg-stat-num" id="regTotal">0</span><span class="reg-stat-label">Provas</span></div>
+        <div class="reg-stat"><span class="reg-stat-num" id="regMediaNota">—</span><span class="reg-stat-label">Média</span></div>
+        <div class="reg-stat"><span class="reg-stat-num" id="regMelhor">—</span><span class="reg-stat-label">Melhor</span></div>
+      </div>
+    </div>
+    <div class="grafico-bar-wrap" id="graficoWrap" style="display:none">
+      <div class="grafico-bar-label">📈 Últimas 10 notas</div>
+      <div class="grafico-bars" id="graficoBars"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap">
+      <div class="registro-filtros">
+        <button class="filtro-btn ativo" onclick="filtrarRegistro('todos',this)">Todos</button>
+        <button class="filtro-btn" onclick="filtrarRegistro('excelente',this)">🌟 Ótimos (≥9)</button>
+        <button class="filtro-btn" onclick="filtrarRegistro('bom',this)">🌿 Bons (≥7)</button>
+        <button class="filtro-btn" onclick="filtrarRegistro('regular',this)">🌱 Regulares</button>
+        <button class="filtro-btn" onclick="filtrarRegistro('ruim',this)">📚 Abaixo</button>
+      </div>
+      <button class="btn-limpar-registro" onclick="limparRegistro()">🗑 Limpar</button>
+    </div>
+    <div id="registroConteudo">
+      <div class="registro-vazio" id="registroVazio"><span class="registro-vazio-icon">📋</span>Nenhuma prova registrada ainda.<br>Complete uma prova para ver seu histórico aqui!</div>
+      <div class="registro-lista" id="registroLista"></div>
+    </div>
+  </div>
+</main>
+
+<div class="music-player">
+  <button class="play-btn" id="playBtn" onclick="toggleMusic()">▶</button>
+  <div class="music-info"><span class="music-title">Sons da Natureza</span><span class="music-status" id="musicStatus">Pausado</span></div>
+  <div class="wave-bars paused" id="waveBars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+  <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="25" oninput="setVolume(this.value)">
+  <span style="font-size:0.75rem">🔊</span>
+</div>
+
+<script>
+// FOLHAS ANIMADAS
+const leafEmojis = ['🍃','🌿','🍂','🍁','☘️'];
+const container = document.getElementById('leaves-container');
+for (let i = 0; i < 15; i++) {
+  const leaf = document.createElement('div');
+  leaf.className = 'leaf';
+  leaf.textContent = leafEmojis[Math.floor(Math.random() * leafEmojis.length)];
+  leaf.style.left = Math.random() * 100 + 'vw';
+  leaf.style.animationDuration = (8 + Math.random() * 12) + 's';
+  leaf.style.animationDelay = (Math.random() * 15) + 's';
+  leaf.style.fontSize = (0.8 + Math.random() * 0.8) + 'rem';
+  container.appendChild(leaf);
+}
+
+// MÚSICA
+let audioCtx = null, isPlaying = false, gainNode = null, sources = [];
+
+function createNatureSounds() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    gainNode = audioCtx.createGain();
+    gainNode.gain.value = 0.08;
+    gainNode.connect(audioCtx.destination);
+  }
+  createRainLayer(); createBirdsLayer(); createWindLayer();
+}
+
+function createRainLayer() {
+  const bufferSize = audioCtx.sampleRate * 4;
+  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.4;
+  if (!isPlaying) return;
+  const source = audioCtx.createBufferSource();
+  source.buffer = buffer; source.loop = true;
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'bandpass'; filter.frequency.value = 800 + Math.random() * 400; filter.Q.value = 0.3;
+  const g = audioCtx.createGain(); g.gain.value = 0.15;
+  source.connect(filter); filter.connect(g); g.connect(gainNode);
+  source.start(); sources.push(source);
+}
+
+function createWindLayer() {
+  function playWind() {
+    if (!isPlaying) return;
+    const bufferSize = audioCtx.sampleRate * 6;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.3;
+    const source = audioCtx.createBufferSource(); source.buffer = buffer;
+    const filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 300 + Math.random() * 200;
+    const g = audioCtx.createGain(); g.gain.value = 0.08;
+    g.gain.setValueAtTime(0, audioCtx.currentTime);
+    g.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 3);
+    g.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 6);
+    source.connect(filter); filter.connect(g); g.connect(gainNode);
+    source.start(); sources.push(source);
+    source.onended = () => { setTimeout(() => { if (isPlaying) playWind(); }, 2000 + Math.random() * 4000); };
+  }
+  playWind();
+}
+
+function createBirdsLayer() {
+  function createBirdCall() {
+    if (!isPlaying) return;
+    const osc1 = audioCtx.createOscillator(), osc2 = audioCtx.createOscillator(), g = audioCtx.createGain();
+    const baseFreq = 1200 + Math.random() * 1800;
+    osc1.frequency.value = baseFreq; osc2.frequency.value = baseFreq * 1.5;
+    osc1.type = 'sine'; osc2.type = 'sine';
+    osc1.frequency.setValueAtTime(baseFreq, audioCtx.currentTime);
+    osc1.frequency.exponentialRampToValueAtTime(baseFreq * 1.3, audioCtx.currentTime + 0.08);
+    osc1.frequency.exponentialRampToValueAtTime(baseFreq, audioCtx.currentTime + 0.15);
+    g.gain.setValueAtTime(0, audioCtx.currentTime);
+    g.gain.linearRampToValueAtTime(0.06, audioCtx.currentTime + 0.02);
+    g.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
+    osc1.connect(g); osc2.connect(g); g.connect(gainNode);
+    osc1.start(audioCtx.currentTime); osc2.start(audioCtx.currentTime);
+    osc1.stop(audioCtx.currentTime + 0.2); osc2.stop(audioCtx.currentTime + 0.2);
+    sources.push(osc1, osc2);
+    setTimeout(() => { if (isPlaying) createBirdCall(); }, 1500 + Math.random() * 5000);
+  }
+  setTimeout(() => createBirdCall(), 1000);
+  setTimeout(() => createBirdCall(), 3000);
+}
+
+function stopAllSources() { sources.forEach(s => { try { s.stop(); } catch(e) {} }); sources = []; }
+
+function toggleMusic() {
+  const btn = document.getElementById('playBtn'), status = document.getElementById('musicStatus'), waves = document.getElementById('waveBars');
+  if (!isPlaying) {
+    isPlaying = true; createNatureSounds();
+    btn.textContent = '⏸'; status.textContent = 'Tocando...'; waves.classList.remove('paused');
+  } else {
+    isPlaying = false; stopAllSources();
+    if (audioCtx) { audioCtx.close(); audioCtx = null; gainNode = null; }
+    btn.textContent = '▶'; status.textContent = 'Pausado'; waves.classList.add('paused');
+  }
+}
+
+function setVolume(val) { if (gainNode) gainNode.gain.value = val / 400; }
+
+// TIMER POMODORO
+let timerInterval = null, timerSeconds = 25 * 60, timerRunning = false;
+
+function updateTimerDisplay() {
+  const m = Math.floor(timerSeconds / 60).toString().padStart(2,'0');
+  const s = (timerSeconds % 60).toString().padStart(2,'0');
+  document.getElementById('timerDisplay').textContent = m + ':' + s;
+}
+function startTimer() {
+  if (timerRunning) return; timerRunning = true;
+  timerInterval = setInterval(() => {
+    if (timerSeconds > 0) { timerSeconds--; updateTimerDisplay(); updateProgress(); }
+    else { clearInterval(timerInterval); timerRunning = false; document.getElementById('timerDisplay').textContent = '🎉'; }
+  }, 1000);
+}
+function pauseTimer() { clearInterval(timerInterval); timerRunning = false; }
+function resetTimer() { clearInterval(timerInterval); timerRunning = false; timerSeconds = 25 * 60; updateTimerDisplay(); document.getElementById('progressBar').style.width = '0%'; }
+function updateProgress() { const total = 25*60, done = total - timerSeconds; document.getElementById('progressBar').style.width = (done/total*100) + '%'; }
+
+// TÓPICOS DE ESTUDO
+const titles = { floresta:'🔬 Ciências & Biologia', oceano:'➗ Matemática', ciclo:'📖 Português & Literatura', fauna:'🌍 História & Geografia', clima:'⚗️ Química & Física', plantas:'🌐 Inglês & Idiomas' };
+
+function showTopic(id) {
+  document.querySelectorAll('.content-block').forEach(b => b.classList.remove('active'));
+  document.getElementById('topic-' + id).classList.add('active');
+  document.getElementById('studyTitle').textContent = titles[id];
+  document.getElementById('studyArea').style.display = 'block';
+  document.getElementById('studyArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// QUIZ
+function answer(btn, result, currentId, nextId) {
+  const questionEl = document.getElementById(currentId);
+  const opts = questionEl.querySelectorAll('.quiz-opt');
+  opts.forEach(o => o.disabled = true);
+  const fb = document.getElementById('fb-' + currentId);
+  if (result === 'correct') {
+    btn.classList.add('correct'); fb.textContent = '✅ Correto! Excelente!'; fb.className = 'quiz-feedback show ok';
+  } else {
+    btn.classList.add('wrong');
+    opts.forEach(o => { if (o.onclick.toString().includes("'correct'")) o.classList.add('correct'); });
+    fb.textContent = '❌ Ops! Observe a resposta correta acima.'; fb.className = 'quiz-feedback show fail';
+  }
+  if (nextId) { const nb = document.getElementById('next-' + currentId); if (nb) nb.style.display = 'inline-block'; }
+}
+function nextQ(currentId, nextId) {
+  document.getElementById(currentId).classList.remove('visible');
+  const next = document.getElementById(nextId); if (next) next.classList.add('visible');
+}
+
+// CHAT COM IA
+const chatHistory = [];
+
+function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
+function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+function sendSuggestion(btn) {
+  const text = btn.textContent.replace(/^[^\s]+\s/, '');
+  document.getElementById('chatInput').value = text;
+  document.getElementById('chatSuggestions').style.display = 'none';
+  sendMessage();
+}
+function appendMessage(role, text) {
+  const c = document.getElementById('chatMessages');
+  const div = document.createElement('div'); div.className = 'msg 
