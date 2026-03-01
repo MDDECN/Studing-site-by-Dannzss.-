@@ -10,12 +10,8 @@
     --verde-escuro: #1a2e1a;
     --verde-medio: #2d5a27;
     --verde-claro: #4a8c3f;
-    --verde-musgo: #6b7c45;
     --dourado: #c8a84b;
     --creme: #f5f0e8;
-    --bege: #e8dfc8;
-    --marrom: #5c4a2a;
-    --texto: #2a1f0a;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -30,117 +26,71 @@
 
   .bg-canvas {
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;
-    z-index: 0;
-    background: 
-      radial-gradient(ellipse at 20% 20%, rgba(74,140,63,0.15) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 80%, rgba(107,124,69,0.15) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 50%, rgba(26,46,26,0.9) 0%, transparent 70%),
-      linear-gradient(160deg, #0d1f0d 0%, #1a2e1a 40%, #1e3820 100%);
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse at 50% 50%, rgba(26,46,26,0.9) 0%, transparent 70%),
+                linear-gradient(160deg, #0d1f0d 0%, #1a2e1a 40%, #1e3820 100%);
   }
 
-  .leaf {
-    position: fixed;
-    font-size: 1.2rem;
-    opacity: 0;
-    animation: leafFall linear infinite;
-    pointer-events: none;
-    z-index: 0;
-  }
-
+  .leaf { position: fixed; font-size: 1.2rem; opacity: 0; animation: leafFall linear infinite; z-index: 0; }
   @keyframes leafFall {
-    0% { transform: translateY(-50px) rotate(0deg) translateX(0); opacity: 0; }
+    0% { transform: translateY(-50px) rotate(0deg); opacity: 0; }
     10% { opacity: 0.4; }
-    90% { opacity: 0.2; }
-    100% { transform: translateY(110vh) rotate(360deg) translateX(60px); opacity: 0; }
+    100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
   }
 
-  header {
-    position: relative;
-    z-index: 10;
-    text-align: center;
-    padding: 3rem 2rem 2rem;
-    border-bottom: 1px solid rgba(200,168,75,0.2);
-  }
-
-  .logo-icon {
-    font-size: 3rem;
-    display: block;
-    margin-bottom: 0.5rem;
-    filter: drop-shadow(0 0 20px rgba(74,140,63,0.6));
-    animation: breathe 4s ease-in-out infinite;
-  }
-
-  @keyframes breathe {
-    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(74,140,63,0.6)); }
-    50% { transform: scale(1.05); filter: drop-shadow(0 0 35px rgba(74,140,63,0.9)); }
-  }
-
-  h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    font-weight: 400;
-    color: var(--creme);
-    letter-spacing: 0.05em;
-    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
-  }
-
+  header { position: relative; z-index: 10; text-align: center; padding: 3rem 2rem; border-bottom: 1px solid rgba(200,168,75,0.2); }
+  h1 { font-family: 'Playfair Display', serif; font-size: 3rem; }
   h1 span { color: var(--dourado); font-style: italic; }
 
-  .subtitle {
-    color: rgba(245,240,232,0.6);
-    margin-top: 0.5rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    font-size: 0.75rem;
-  }
+  main { position: relative; z-index: 10; max-width: 1100px; margin: 0 auto; padding: 2rem; }
 
-  main {
-    position: relative; z-index: 10;
-    max-width: 1100px; margin: 0 auto; padding: 3rem 2rem 8rem;
+  .topics-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+    gap: 1.2rem; 
+    margin-bottom: 3rem; 
   }
-
-  .section-title {
-    font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 400;
-    color: var(--dourado); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;
-  }
-  .section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(200,168,75,0.4), transparent); }
-
-  .topics-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
 
   .topic-card {
-    background: rgba(255,255,255,0.04); border: 1px solid rgba(200,168,75,0.15);
-    border-radius: 16px; padding: 1.75rem; cursor: pointer; transition: all 0.3s ease;
-    position: relative; overflow: hidden;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(200,168,75,0.2);
+    border-radius: 15px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: center;
   }
-  .topic-card:hover { border-color: rgba(200,168,75,0.4); transform: translateY(-3px); }
-  .topic-icon { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
-  .topic-card h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--creme); }
-  .topic-tag { display: inline-block; margin-top: 1rem; padding: 0.25rem 0.75rem; background: rgba(74,140,63,0.2); border-radius: 20px; font-size: 0.7rem; color: var(--verde-claro); }
+  .topic-card:hover { 
+    transform: translateY(-5px); 
+    background: rgba(255,255,255,0.1);
+    border-color: var(--dourado);
+  }
+  .topic-icon { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
 
-  .study-area { background: rgba(255,255,255,0.03); border: 1px solid rgba(200,168,75,0.15); border-radius: 20px; padding: 2.5rem; margin-bottom: 3rem; display:none; }
-  .content-block { display: none; }
-  .content-block.active { display: block; animation: fadeIn 0.5s ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .study-area { 
+    background: rgba(0,0,0,0.2); 
+    border: 1px solid var(--dourado); 
+    border-radius: 20px; 
+    padding: 2rem; 
+    display: none; 
+    margin-bottom: 3rem;
+    animation: fadeIn 0.5s ease;
+  }
+  .content-block { display: none; line-height: 1.6; }
+  .content-block h4 { color: var(--dourado); margin: 1rem 0 0.5rem; }
 
-  .chat-section { background: rgba(255,255,255,0.03); border: 1px solid rgba(200,168,75,0.2); border-radius: 20px; padding: 2rem; margin-bottom: 3rem; }
-  .chat-messages { height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.25rem; }
-  .msg { display: flex; gap: 0.75rem; max-width: 88%; }
-  .msg.user { align-self: flex-end; flex-direction: row-reverse; }
-  .msg-bubble { padding: 0.75rem 1rem; border-radius: 14px; font-size: 0.92rem; background: rgba(74,140,63,0.12); border: 1px solid rgba(74,140,63,0.2); }
-  .msg.user .msg-bubble { background: rgba(200,168,75,0.12); border-color: rgba(200,168,75,0.2); }
-  
-  .chat-input-row { display: flex; gap: 0.75rem; }
-  .chat-input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(200,168,75,0.2); border-radius: 12px; padding: 0.75rem; color: var(--creme); outline: none; }
-  .chat-send-btn { background: var(--verde-medio); border: none; color: white; width: 44px; border-radius: 12px; cursor: pointer; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-  .prova-section { background: rgba(255,255,255,0.03); border: 1px solid rgba(200,168,75,0.2); border-radius: 20px; padding: 2rem; margin-bottom: 3rem; }
-  .btn-iniciar-prova { width: 100%; background: linear-gradient(135deg, var(--verde-medio), var(--verde-claro)); border: none; padding: 1rem; color: white; border-radius: 12px; cursor: pointer; font-family: 'Playfair Display', serif; }
-  
-  .music-player { position: fixed; bottom: 2rem; right: 2rem; z-index: 100; background: rgba(26,46,26,0.9); border: 1px solid rgba(200,168,75,0.3); border-radius: 50px; padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 0.75rem; backdrop-filter: blur(12px); }
-  .play-btn { background: var(--verde-claro); border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; color: white; }
+  .chat-section { background: rgba(255,255,255,0.03); border-radius: 20px; padding: 1.5rem; margin-top: 2rem; border: 1px solid rgba(200,168,75,0.1); }
+  .chat-messages { height: 200px; overflow-y: auto; margin-bottom: 1rem; padding-right: 10px; }
+  .msg-bubble { padding: 8px 15px; border-radius: 10px; margin-bottom: 8px; max-width: 80%; }
+  .ai { background: rgba(74,140,63,0.2); align-self: flex-start; }
+  .user { background: rgba(200,168,75,0.2); align-self: flex-end; margin-left: auto; text-align: right; }
+
+  .input-group { display: flex; gap: 10px; }
+  input { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--dourado); background: none; color: white; }
+  button { padding: 10px 20px; border-radius: 10px; border: none; background: var(--verde-claro); color: white; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -149,112 +99,129 @@
 <div id="leaves-container"></div>
 
 <header>
-  <span class="logo-icon">🌿</span>
   <h1>Jardim do <span>Saber</span></h1>
-  <p class="subtitle">Estude</p>
+  <p>Dannzss— Ambiente de Estudos</p>
 </header>
 
 <main>
-  <p class="section-title">📚 Escolha uma matéria</p>
   <div class="topics-grid">
-    <div class="topic-card" onclick="showTopic('floresta')"><span class="topic-icon">🔬</span><h3>Biologia</h3><span class="topic-tag">Ciências</span></div>
-    <div class="topic-card" onclick="showTopic('oceano')"><span class="topic-icon">➗</span><h3>Matemática</h3><span class="topic-tag">Exatas</span></div>
-    <div class="topic-card" onclick="showTopic('clima')"><span class="topic-icon">⚡</span><h3>Física</h3><span class="topic-tag">Exatas</span></div>
+    <div class="topic-card" onclick="showTopic('mat')"><span class="topic-icon">➗</span><h3>Matemática</h3></div>
+    <div class="topic-card" onclick="showTopic('bio')"><span class="topic-icon">🌿</span><h3>Biologia</h3></div>
+    <div class="topic-card" onclick="showTopic('geo')"><span class="topic-icon">🌍</span><h3>Geografia</h3></div>
+    <div class="topic-card" onclick="showTopic('hist')"><span class="topic-icon">📜</span><h3>História</h3></div>
+    <div class="topic-card" onclick="showTopic('art')"><span class="topic-icon">🎨</span><h3>Artes</h3></div>
+    <div class="topic-card" onclick="showTopic('filo')"><span class="topic-icon">🧠</span><h3>Filosofia</h3></div>
+    <div class="topic-card" onclick="showTopic('fis')"><span class="topic-icon">⚛️</span><h3>Física</h3></div>
+    <div class="topic-card" onclick="showTopic('qui')"><span class="topic-icon">🧪</span><h3>Química</h3></div>
   </div>
 
   <div class="study-area" id="studyArea">
-    <h2 id="studyTitle" style="margin-bottom:1rem; font-family:'Playfair Display'">Matéria</h2>
-    <div class="content-block" id="topic-floresta">
-      <p>A Biologia estuda a vida. As florestas cobrem 31% da Terra.</p>
+    <h2 id="studyTitle" style="color:var(--dourado); font-family:'Playfair Display'; margin-bottom:1rem">Matéria</h2>
+    
+    <div id="content-mat" class="content-block">
+        <h4>Aritmética e Álgebra</h4>
+        <p>A matemática é a base de todas as ciências. Do cálculo de áreas simples às equações complexas de segundo grau ($ax^2 + bx + c = 0$).</p>
     </div>
-    <div class="content-block" id="topic-oceano">
-      <p>Matemática é a linguagem do universo. $E = mc^2$.</p>
+
+    <div id="content-bio" class="content-block">
+        <h4>Reinos da Natureza</h4>
+        <p>Estudo dos seres vivos, genética e ecossistemas. Lembre-se: a célula é a unidade básica da vida.</p>
     </div>
-    <div class="content-block" id="topic-clima">
-      <p>Física estuda as forças da natureza e as leis do movimento.</p>
+
+    <div id="content-geo" class="content-block">
+        <h4>Geopolítica e Clima</h4>
+        <p>Estudo do relevo, das massas de ar e das relações entre países e o meio ambiente.</p>
+    </div>
+
+    <div id="content-hist" class="content-block">
+        <h4>Linha do Tempo</h4>
+        <p>Das civilizações antigas (Egito e Grécia) até a Idade Contemporânea e as revoluções tecnológicas.</p>
+    </div>
+
+    <div id="content-art" class="content-block">
+        <h4>Movimentos Artísticos</h4>
+        <p>Do Renascimento ao Modernismo. A arte é a expressão máxima da cultura humana.</p>
+    </div>
+
+    <div id="content-filo" class="content-block">
+        <h4>O Pensamento Humano</h4>
+        <p>Sócrates, Platão e Aristóteles. "Conhece-te a ti mesmo" e a busca pela verdade através da razão.</p>
+    </div>
+
+    <div id="content-fis" class="content-block">
+        <h4>Mecânica e Energia</h4>
+        <p>As leis de Newton explicam o movimento. $F = m \cdot a$. Tudo no universo interage através de forças.</p>
+    </div>
+
+    <div id="content-qui" class="content-block">
+        <h4>Matéria e Reações</h4>
+        <p>Átomos, elementos da Tabela Periódica e as ligações químicas que formam tudo o que tocamos.</p>
     </div>
   </div>
 
   <div class="chat-section">
-    <div id="chatMessages" class="chat-messages">
-        <div class="msg ai"><div class="msg-bubble">Olá, <strong>estudante!</strong>! Como posso ajudar nos seus estudos hoje?</div></div>
+    <div id="chatMessages" class="chat-messages" style="display: flex; flex-direction: column;">
+        <div class="msg-bubble ai">Olá, estudante! Qual dessas matérias vamos revisar agora?</div>
     </div>
-    <div class="chat-input-row">
-      <input type="text" class="chat-input" id="chatInput" placeholder="Pergunte algo..." onkeydown="if(event.key==='Enter')sendMessage()">
-      <button class="chat-send-btn" onclick="sendMessage()">➤</button>
-    </div>
-  </div>
-
-  <div class="prova-section">
-    <div id="provaConfig">
-        <h3 style="margin-bottom:1rem">Configurar Prova</h3>
-        <button class="btn-iniciar-prova" onclick="iniciarProva()">Gerar Prova com IA</button>
-    </div>
-    <div id="provaAndamento" style="display:none; text-align:center">
-        <p>Prova Iniciada! Questão 1: O que é Inércia?</p>
-        <button class="btn-iniciar-prova" style="margin-top:1rem" onclick="location.reload()">Finalizar</button>
+    <div class="input-group">
+      <input type="text" id="chatInput" placeholder="Tire uma dúvida..." onkeydown="if(event.key==='Enter')sendMessage()">
+      <button onclick="sendMessage()">Perguntar</button>
     </div>
   </div>
 </main>
 
-<div class="music-player">
-  <button class="play-btn" onclick="alert('Sons da natureza ativados!')">▶</button>
-  <span style="font-size:0.8rem">Sons da Natureza</span>
-</div>
-
 <script>
-// --- FOLHAS ANIMADAS ---
-const container = document.getElementById('leaves-container');
+// Gerar Folhas
+const leafContainer = document.getElementById('leaves-container');
 for (let i = 0; i < 15; i++) {
-  const leaf = document.createElement('div');
-  leaf.className = 'leaf';
-  leaf.textContent = '🍃';
-  leaf.style.left = Math.random() * 100 + 'vw';
-  leaf.style.animationDuration = (8 + Math.random() * 12) + 's';
-  leaf.style.animationDelay = (Math.random() * 5) + 's';
-  container.appendChild(leaf);
+    const leaf = document.createElement('div');
+    leaf.className = 'leaf'; leaf.textContent = '🍃';
+    leaf.style.left = Math.random() * 100 + 'vw';
+    leaf.style.animationDuration = (5 + Math.random() * 10) + 's';
+    leaf.style.animationDelay = (Math.random() * 5) + 's';
+    leafContainer.appendChild(leaf);
 }
 
-// --- NAVEGAÇÃO ---
-const titles = { floresta: '🔬 Biologia', oceano: '➗ Matemática', clima: '⚡ Física' };
+// Trocar Matérias
+const titles = {
+    mat: 'Matemática', bio: 'Biologia', geo: 'Geografia', 
+    hist: 'História', art: 'Artes', filo: 'Filosofia', 
+    fis: 'Física', qui: 'Química'
+};
 
 function showTopic(id) {
     document.getElementById('studyArea').style.display = 'block';
     document.querySelectorAll('.content-block').forEach(b => b.style.display = 'none');
-    document.getElementById('topic-' + id).style.display = 'block';
+    document.getElementById('content-' + id).style.display = 'block';
     document.getElementById('studyTitle').textContent = titles[id];
-    window.scrollTo({ top: document.getElementById('studyArea').offsetTop - 50, behavior: 'smooth' });
+    window.scrollTo({ top: document.getElementById('studyArea').offsetTop - 20, behavior: 'smooth' });
 }
 
-// --- CHAT ---
+// Lógica do Chat
 function sendMessage() {
     const input = document.getElementById('chatInput');
-    const text = input.value.trim();
-    if (!text) return;
+    const msg = input.value.trim();
+    if(!msg) return;
 
-    appendMsg('user', text);
+    const chat = document.getElementById('chatMessages');
+    
+    // Usuário
+    const userDiv = document.createElement('div');
+    userDiv.className = 'msg-bubble user';
+    userDiv.textContent = msg;
+    chat.appendChild(userDiv);
+    
     input.value = '';
 
+    // Resposta IA
     setTimeout(() => {
-        appendMsg('ai', "Excelente pergunta! Como seu Professor Raiz, sugiro focar na base teórica dessa matéria.");
-    }, 1000);
-}
-
-function appendMsg(role, text) {
-    const chat = document.getElementById('chatMessages');
-    const div = document.createElement('div');
-    div.className = `msg ${role}`;
-    div.innerHTML = `<div class="msg-bubble">${text}</div>`;
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
-}
-
-// --- PROVA ---
-function iniciarProva() {
-    document.getElementById('provaConfig').style.display = 'none';
-    document.getElementById('provaAndamento').style.display = 'block';
+        const aiDiv = document.createElement('div');
+        aiDiv.className = 'msg-bubble ai';
+        aiDiv.innerHTML = `Usuário, sobre "<strong>${msg}</strong>", o melhor é revisar os conceitos base no Jardim do Saber! 🌿`;
+        chat.appendChild(aiDiv);
+        chat.scrollTop = chat.scrollHeight;
+    }, 600);
 }
 </script>
-
 </body>
 </html>
