@@ -83,14 +83,17 @@
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
   .chat-section { background: rgba(255,255,255,0.03); border-radius: 20px; padding: 1.5rem; margin-top: 2rem; border: 1px solid rgba(200,168,75,0.1); }
-  .chat-messages { height: 200px; overflow-y: auto; margin-bottom: 1rem; padding-right: 10px; }
-  .msg-bubble { padding: 8px 15px; border-radius: 10px; margin-bottom: 8px; max-width: 80%; }
-  .ai { background: rgba(74,140,63,0.2); align-self: flex-start; }
-  .user { background: rgba(200,168,75,0.2); align-self: flex-end; margin-left: auto; text-align: right; }
+  .chat-messages { height: 250px; overflow-y: auto; margin-bottom: 1rem; padding-right: 10px; display: flex; flex-direction: column; }
+  .msg-bubble { padding: 10px 15px; border-radius: 12px; margin-bottom: 10px; max-width: 85%; line-height: 1.4; word-wrap: break-word; }
+  .ai { background: rgba(74,140,63,0.3); align-self: flex-start; border-left: 3px solid var(--verde-claro); }
+  .user { background: rgba(200,168,75,0.2); align-self: flex-end; border-right: 3px solid var(--dourado); }
 
   .input-group { display: flex; gap: 10px; }
-  input { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--dourado); background: none; color: white; }
-  button { padding: 10px 20px; border-radius: 10px; border: none; background: var(--verde-claro); color: white; cursor: pointer; }
+  input { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--dourado); background: rgba(0,0,0,0.3); color: white; }
+  button { padding: 10px 20px; border-radius: 10px; border: none; background: var(--verde-claro); color: white; cursor: pointer; transition: 0.3s; }
+  button:hover { background: var(--verde-medio); }
+  
+  .api-status { font-size: 0.7rem; color: #888; margin-top: 10px; cursor: pointer; text-decoration: underline; text-align: right; }
 </style>
 </head>
 <body>
@@ -100,7 +103,7 @@
 
 <header>
   <h1>Jardim do <span>Saber</span></h1>
-  <p>Dannzss — Ambiente de Estudos</p>
+  <p>Dannzss — Ambiente de Estudos Inteligente</p>
 </header>
 
 <main>
@@ -117,110 +120,124 @@
 
   <div class="study-area" id="studyArea">
     <h2 id="studyTitle" style="color:var(--dourado); font-family:'Playfair Display'; margin-bottom:1rem">Matéria</h2>
-    
-    <div id="content-mat" class="content-block">
-        <h4>Aritmética e Álgebra</h4>
-        <p>A matemática é a base de todas as ciências. Do cálculo de áreas simples às equações complexas de segundo grau ($ax^2 + bx + c = 0$).</p>
-    </div>
-
-    <div id="content-bio" class="content-block">
-        <h4>Reinos da Natureza</h4>
-        <p>Estudo dos seres vivos, genética e ecossistemas. Lembre-se: a célula é a unidade básica da vida.</p>
-    </div>
-
-    <div id="content-geo" class="content-block">
-        <h4>Geopolítica e Clima</h4>
-        <p>Estudo do relevo, das massas de ar e das relações entre países e o meio ambiente.</p>
-    </div>
-
-    <div id="content-hist" class="content-block">
-        <h4>Linha do Tempo</h4>
-        <p>Das civilizações antigas (Egito e Grécia) até a Idade Contemporânea e as revoluções tecnológicas.</p>
-    </div>
-
-    <div id="content-art" class="content-block">
-        <h4>Movimentos Artísticos</h4>
-        <p>Do Renascimento ao Modernismo. A arte é a expressão máxima da cultura humana.</p>
-    </div>
-
-    <div id="content-filo" class="content-block">
-        <h4>O Pensamento Humano</h4>
-        <p>Sócrates, Platão e Aristóteles. "Conhece-te a ti mesmo" e a busca pela verdade através da razão.</p>
-    </div>
-
-    <div id="content-fis" class="content-block">
-        <h4>Mecânica e Energia</h4>
-        <p>As leis de Newton explicam o movimento. $F = m \cdot a$. Tudo no universo interage através de forças.</p>
-    </div>
-
-    <div id="content-qui" class="content-block">
-        <h4>Matéria e Reações</h4>
-        <p>Átomos, elementos da Tabela Periódica e as ligações químicas que formam tudo o que tocamos.</p>
+    <div id="content-display" class="content-block" style="display:block">
+        <p>Selecione uma matéria acima para começar.</p>
     </div>
   </div>
 
   <div class="chat-section">
-    <div id="chatMessages" class="chat-messages" style="display: flex; flex-direction: column;">
-        <div class="msg-bubble ai">Olá, estudante! Qual dessas matérias vamos revisar agora?</div>
+    <div id="chatMessages" class="chat-messages">
+        <div class="msg-bubble ai">Olá! Sou seu tutor IA do Jardim do Saber. Pergunte qualquer coisa sobre as matérias acima!</div>
     </div>
     <div class="input-group">
-      <input type="text" id="chatInput" placeholder="Tire uma dúvida..." onkeydown="if(event.key==='Enter')sendMessage()">
-      <button onclick="sendMessage()">Perguntar</button>
+      <input type="text" id="chatInput" placeholder="Sua dúvida acadêmica..." onkeydown="if(event.key==='Enter')sendMessage()">
+      <button id="sendBtn" onclick="sendMessage()">Perguntar</button>
     </div>
+    <div class="api-status" onclick="resetApiKey()">Resetar Chave API Pollinations</div>
   </div>
 </main>
 
 <script>
-// Gerar Folhas
+// Configuração de API
+let API_KEY = localStorage.getItem('pollinations_key');
+
+function resetApiKey() {
+    localStorage.removeItem('pollinations_key');
+    API_KEY = null;
+    alert("Chave removida. O site pedirá uma nova no próximo envio.");
+}
+
+// Folhas Caindo
 const leafContainer = document.getElementById('leaves-container');
 for (let i = 0; i < 15; i++) {
     const leaf = document.createElement('div');
     leaf.className = 'leaf'; leaf.textContent = '🍃';
     leaf.style.left = Math.random() * 100 + 'vw';
     leaf.style.animationDuration = (5 + Math.random() * 10) + 's';
-    leaf.style.animationDelay = (Math.random() * 5) + 's';
     leafContainer.appendChild(leaf);
 }
 
-// Trocar Matérias
-const titles = {
-    mat: 'Matemática', bio: 'Biologia', geo: 'Geografia', 
-    hist: 'História', art: 'Artes', filo: 'Filosofia', 
-    fis: 'Física', qui: 'Química'
+// Navegação de Matérias
+const contents = {
+    mat: "<h4>Matemática</h4><p>Foco: Funções, Álgebra e Geometria. Estude as bases para avançar em cálculos complexos.</p>",
+    bio: "<h4>Biologia</h4><p>Foco: Citologia e Genética. A vida começa na compreensão da célula.</p>",
+    geo: "<h4>Geografia</h4><p>Foco: Cartografia e Geopolítica Mundial.</p>",
+    hist: "<h4>História</h4><p>Foco: Idade Média e Revoluções Industriais.</p>",
+    art: "<h4>Artes</h4><p>Foco: Renascimento e Arte Contemporânea.</p>",
+    filo: "<h4>Filosofia</h4><p>Foco: Ética, Lógica e os Pré-Socráticos.</p>",
+    fis: "<h4>Física</h4><p>Foco: Termodinâmica e Mecânica Clássica.</p>",
+    qui: "<h4>Química</h4><p>Foco: Tabela Periódica e Estequiometria.</p>"
 };
 
 function showTopic(id) {
     document.getElementById('studyArea').style.display = 'block';
-    document.querySelectorAll('.content-block').forEach(b => b.style.display = 'none');
-    document.getElementById('content-' + id).style.display = 'block';
-    document.getElementById('studyTitle').textContent = titles[id];
-    window.scrollTo({ top: document.getElementById('studyArea').offsetTop - 20, behavior: 'smooth' });
+    document.getElementById('content-display').innerHTML = contents[id];
+    document.getElementById('studyTitle').textContent = id.toUpperCase();
 }
 
-// Lógica do Chat
-function sendMessage() {
+// Lógica do Chat com IA Real
+async function sendMessage() {
     const input = document.getElementById('chatInput');
     const msg = input.value.trim();
     if(!msg) return;
 
+    // Nova atualização pa teu site. (eu n sei se figou boa mas tá td bem.)
+    if (!API_KEY) {
+        API_KEY = prompt("Por favor, insira sua Chave de API do Pollinations.ai para continuar:");
+        if (API_KEY) {
+            localStorage.setItem('pollinations_key', API_KEY);
+        } else {
+            alert("A chave é necessária para usar o chat com IA.");
+            return;
+        }
+    }
+
     const chat = document.getElementById('chatMessages');
-    
-    // Usuário
+    const sendBtn = document.getElementById('sendBtn');
+
+    // Adicionar mensagem do usuário
     const userDiv = document.createElement('div');
     userDiv.className = 'msg-bubble user';
     userDiv.textContent = msg;
     chat.appendChild(userDiv);
-    
     input.value = '';
+    chat.scrollTop = chat.scrollHeight;
 
-    // Resposta IA
-    setTimeout(() => {
-        const aiDiv = document.createElement('div');
-        aiDiv.className = 'msg-bubble ai';
-        aiDiv.innerHTML = `Estudante, sobre "<strong>${msg}</strong>", o melhor é revisar os conceitos base no Jardim do Saber! 🌿`;
-        chat.appendChild(aiDiv);
+    // Indicador de "Pensando"
+    const thinkingDiv = document.createElement('div');
+    thinkingDiv.className = 'msg-bubble ai';
+    thinkingDiv.textContent = "O professor está analisando sua pergunta...";
+    chat.appendChild(thinkingDiv);
+    sendBtn.disabled = true;
+
+    try {
+        const response = await fetch('https://text.pollinations.ai/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${API_KEY}`
+            },
+            body: JSON.stringify({
+                messages: [
+                    { role: 'system', content: 'Você é um professor tutor do Jardim do Saber. Responda de forma clara, educada e sempre em Português do Brasil.' },
+                    { role: 'user', content: msg }
+                ],
+                model: 'openai'
+            })
+        });
+
+        if (!response.ok) throw new Error('Erro na chave ou conexão');
+
+        const data = await response.text();
+        thinkingDiv.innerHTML = data.replace(/\n/g, "<br>");
+
+    } catch (error) {
+        thinkingDiv.textContent = "Erro: Não foi possível conectar à IA. Verifique sua chave API.";
+        console.error(error);
+    } finally {
+        sendBtn.disabled = false;
         chat.scrollTop = chat.scrollHeight;
-    }, 600);
+    }
 }
 </script>
 </body>
