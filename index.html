@@ -139,7 +139,6 @@
 </main>
 
 <script>
-// Configuração de API
 let API_KEY = localStorage.getItem('pollinations_key');
 
 function resetApiKey() {
@@ -148,7 +147,7 @@ function resetApiKey() {
     alert("Chave removida. O site pedirá uma nova no próximo envio.");
 }
 
-// Folhas Caindo
+
 const leafContainer = document.getElementById('leaves-container');
 for (let i = 0; i < 15; i++) {
     const leaf = document.createElement('div');
@@ -158,7 +157,7 @@ for (let i = 0; i < 15; i++) {
     leafContainer.appendChild(leaf);
 }
 
-// Navegação de Matérias
+
 const contents = {
     mat: "<h4>Matemática</h4><p>Foco: Funções, Álgebra e Geometria. Estude as bases para avançar em cálculos complexos.</p>",
     bio: "<h4>Biologia</h4><p>Foco: Citologia e Genética. A vida começa na compreensão da célula.</p>",
@@ -176,7 +175,7 @@ function showTopic(id) {
     document.getElementById('studyTitle').textContent = id.toUpperCase();
 }
 
-// Lógica do Chat com IA Real
+
 async function sendMessage() {
     const input = document.getElementById('chatInput');
     const msg = input.value.trim();
@@ -196,7 +195,7 @@ async function sendMessage() {
     const chat = document.getElementById('chatMessages');
     const sendBtn = document.getElementById('sendBtn');
 
-    // Adicionar mensagem do usuário
+    
     const userDiv = document.createElement('div');
     userDiv.className = 'msg-bubble user';
     userDiv.textContent = msg;
@@ -204,7 +203,7 @@ async function sendMessage() {
     input.value = '';
     chat.scrollTop = chat.scrollHeight;
 
-    // Indicador de "Pensando"
+    
     const thinkingDiv = document.createElement('div');
     thinkingDiv.className = 'msg-bubble ai';
     thinkingDiv.textContent = "O professor está analisando sua pergunta...";
