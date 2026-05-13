@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="google-site-verification" content="OIvgzp_QKd0d3xJcsX3grlRAuBjDDVz2oQJOUyKPocc" />
 <title>Jardim do Saber - Dannzss</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,500&display=swap" rel="stylesheet">
 <style>
   :root {
     --verde-escuro: #1a2e1a;
@@ -13,88 +12,103 @@
     --verde-claro: #4a8c3f;
     --dourado: #c8a84b;
     --creme: #f5f0e8;
+    --glass: rgba(255, 255, 255, 0.05);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    font-family: 'Lora', Georgia, serif;
+    font-family: 'Lora', serif;
     background-color: var(--verde-escuro);
     color: var(--creme);
     min-height: 100vh;
-    overflow-x: hidden;
+    line-height: 1.6;
   }
 
   .bg-canvas {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    pointer-events: none; z-index: 0;
-    background: radial-gradient(ellipse at 50% 50%, rgba(26,46,26,0.9) 0%, transparent 70%),
-                linear-gradient(160deg, #0d1f0d 0%, #1a2e1a 40%, #1e3820 100%);
+    z-index: -1;
+    background: radial-gradient(circle at center, #1e3820 0%, #0d1f0d 100%);
   }
 
-  .leaf { position: fixed; font-size: 1.2rem; opacity: 0; animation: leafFall linear infinite; z-index: 0; }
+  .leaf { position: fixed; pointer-events: none; opacity: 0; animation: leafFall linear infinite; z-index: 1; }
   @keyframes leafFall {
-    0% { transform: translateY(-50px) rotate(0deg); opacity: 0; }
-    10% { opacity: 0.4; }
-    100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+    20% { opacity: 0.6; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
   }
 
-  header { position: relative; z-index: 10; text-align: center; padding: 3rem 2rem; border-bottom: 1px solid rgba(200,168,75,0.2); }
-  h1 { font-family: 'Playfair Display', serif; font-size: 3rem; }
+  header { text-align: center; padding: 4rem 2rem; border-bottom: 1px solid rgba(200,168,75,0.15); }
+  h1 { font-family: 'Playfair Display', serif; font-size: 3.5rem; letter-spacing: -1px; }
   h1 span { color: var(--dourado); font-style: italic; }
 
-  main { position: relative; z-index: 10; max-width: 1100px; margin: 0 auto; padding: 2rem; }
+  main { max-width: 1000px; margin: 0 auto; padding: 2rem; position: relative; z-index: 2; }
 
   .topics-grid { 
     display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
-    gap: 1.2rem; 
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
+    gap: 1rem; 
     margin-bottom: 3rem; 
   }
 
   .topic-card {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(200,168,75,0.2);
-    border-radius: 15px;
+    background: var(--glass);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
     padding: 1.5rem;
     cursor: pointer;
-    transition: 0.3s;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     text-align: center;
+    backdrop-filter: blur(5px);
   }
+
   .topic-card:hover { 
-    transform: translateY(-5px); 
-    background: rgba(255,255,255,0.1);
+    transform: translateY(-8px); 
+    background: rgba(200,168,75,0.1);
     border-color: var(--dourado);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
   }
-  .topic-icon { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+
+  .topic-card.active { border-color: var(--dourado); background: rgba(200,168,75,0.15); }
+  .topic-icon { font-size: 2.2rem; display: block; margin-bottom: 0.5rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
 
   .study-area { 
-    background: rgba(0,0,0,0.2); 
-    border: 1px solid var(--dourado); 
-    border-radius: 20px; 
-    padding: 2rem; 
+    background: rgba(0,0,0,0.4); 
+    border: 1px solid rgba(200,168,75,0.3); 
+    border-radius: 24px; 
+    padding: 2.5rem; 
     display: none; 
     margin-bottom: 3rem;
-    animation: fadeIn 0.5s ease;
+    animation: slideUp 0.6s ease;
   }
-  .content-block { display: none; line-height: 1.6; }
-  .content-block h4 { color: var(--dourado); margin: 1rem 0 0.5rem; }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .content-block h4 { color: var(--dourado); font-size: 1.5rem; margin-bottom: 1rem; font-family: 'Playfair Display'; }
 
-  .chat-section { background: rgba(255,255,255,0.03); border-radius: 20px; padding: 1.5rem; margin-top: 2rem; border: 1px solid rgba(200,168,75,0.1); }
-  .chat-messages { height: 250px; overflow-y: auto; margin-bottom: 1rem; padding-right: 10px; display: flex; flex-direction: column; }
-  .msg-bubble { padding: 10px 15px; border-radius: 12px; margin-bottom: 10px; max-width: 85%; line-height: 1.4; word-wrap: break-word; }
-  .ai { background: rgba(74,140,63,0.3); align-self: flex-start; border-left: 3px solid var(--verde-claro); }
-  .user { background: rgba(200,168,75,0.2); align-self: flex-end; border-right: 3px solid var(--dourado); }
-
-  .input-group { display: flex; gap: 10px; }
-  input { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--dourado); background: rgba(0,0,0,0.3); color: white; }
-  button { padding: 10px 20px; border-radius: 10px; border: none; background: var(--verde-claro); color: white; cursor: pointer; transition: 0.3s; }
-  button:hover { background: var(--verde-medio); }
+  .chat-section { 
+    background: var(--glass); 
+    border-radius: 24px; 
+    padding: 2rem; 
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+  }
+  .chat-messages { height: 350px; overflow-y: auto; margin-bottom: 1.5rem; padding-right: 10px; display: flex; flex-direction: column; gap: 12px; }
   
-  .api-status { font-size: 0.7rem; color: #888; margin-top: 10px; cursor: pointer; text-decoration: underline; text-align: right; }
+  .chat-messages::-webkit-scrollbar { width: 5px; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--dourado); border-radius: 10px; }
+
+  .msg-bubble { padding: 12px 18px; border-radius: 18px; max-width: 85%; font-size: 0.95rem; animation: fadeIn 0.3s ease; }
+  .ai { background: rgba(255,255,255,0.08); align-self: flex-start; border-bottom-left-radius: 2px; border-left: 3px solid var(--verde-claro); }
+  .user { background: var(--verde-medio); align-self: flex-end; border-bottom-right-radius: 2px; color: white; }
+
+  .input-group { display: flex; gap: 12px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 15px; border: 1px solid rgba(200,168,75,0.2); }
+  input { flex: 1; padding: 10px 15px; border: none; background: transparent; color: white; outline: none; font-family: 'Lora'; }
+  button { padding: 12px 25px; border-radius: 12px; border: none; background: var(--dourado); color: var(--verde-escuro); font-weight: bold; cursor: pointer; transition: 0.3s; }
+  button:hover:not(:disabled) { transform: scale(1.05); filter: brightness(1.1); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  
+  .api-status { font-size: 0.75rem; color: var(--dourado); margin-top: 15px; opacity: 0.6; cursor: pointer; text-align: center; }
 </style>
 </head>
 <body>
@@ -104,37 +118,34 @@
 
 <header>
   <h1>Jardim do <span>Saber</span></h1>
-  <p>Dannzss — Ambiente de Estudos Inteligente</p>
+  <p>Bem-vindo ao seu refúgio de conhecimento, Dannzss.</p>
 </header>
 
 <main>
-  <div class="topics-grid">
-    <div class="topic-card" onclick="showTopic('mat')"><span class="topic-icon">➗</span><h3>Matemática</h3></div>
-    <div class="topic-card" onclick="showTopic('bio')"><span class="topic-icon">🌿</span><h3>Biologia</h3></div>
-    <div class="topic-card" onclick="showTopic('geo')"><span class="topic-icon">🌍</span><h3>Geografia</h3></div>
-    <div class="topic-card" onclick="showTopic('hist')"><span class="topic-icon">📜</span><h3>História</h3></div>
-    <div class="topic-card" onclick="showTopic('art')"><span class="topic-icon">🎨</span><h3>Artes</h3></div>
-    <div class="topic-card" onclick="showTopic('filo')"><span class="topic-icon">🧠</span><h3>Filosofia</h3></div>
-    <div class="topic-card" onclick="showTopic('fis')"><span class="topic-icon">⚛️</span><h3>Física</h3></div>
-    <div class="topic-card" onclick="showTopic('qui')"><span class="topic-icon">🧪</span><h3>Química</h3></div>
+  <div class="topics-grid" id="topicsGrid">
+    <div class="topic-card" onclick="showTopic('mat', this)"><span class="topic-icon">➗</span><h3>Matemática</h3></div>
+    <div class="topic-card" onclick="showTopic('bio', this)"><span class="topic-icon">🌿</span><h3>Biologia</h3></div>
+    <div class="topic-card" onclick="showTopic('geo', this)"><span class="topic-icon">🌍</span><h3>Geografia</h3></div>
+    <div class="topic-card" onclick="showTopic('hist', this)"><span class="topic-icon">📜</span><h3>História</h3></div>
+    <div class="topic-card" onclick="showTopic('art', this)"><span class="topic-icon">🎨</span><h3>Artes</h3></div>
+    <div class="topic-card" onclick="showTopic('filo', this)"><span class="topic-icon">🧠</span><h3>Filosofia</h3></div>
+    <div class="topic-card" onclick="showTopic('fis', this)"><span class="topic-icon">⚛️</span><h3>Física</h3></div>
+    <div class="topic-card" onclick="showTopic('qui', this)"><span class="topic-icon">🧪</span><h3>Química</h3></div>
   </div>
 
   <div class="study-area" id="studyArea">
-    <h2 id="studyTitle" style="color:var(--dourado); font-family:'Playfair Display'; margin-bottom:1rem">Matéria</h2>
-    <div id="content-display" class="content-block" style="display:block">
-        <p>Selecione uma matéria acima para começar.</p>
-    </div>
+    <div id="content-display" class="content-block"></div>
   </div>
 
   <div class="chat-section">
     <div id="chatMessages" class="chat-messages">
-        <div class="msg-bubble ai">Olá! Sou seu tutor IA do Jardim do Saber. Pergunte qualquer coisa sobre as matérias acima!</div>
+        <div class="msg-bubble ai">Olá! Sou seu tutor do Jardim. Como posso florescer seu entendimento hoje?</div>
     </div>
     <div class="input-group">
-      <input type="text" id="chatInput" placeholder="Sua dúvida acadêmica..." onkeydown="if(event.key==='Enter')sendMessage()">
+      <input type="text" id="chatInput" placeholder="Digite sua dúvida aqui..." autocomplete="off">
       <button id="sendBtn" onclick="sendMessage()">Perguntar</button>
     </div>
-    <div class="api-status" onclick="resetApiKey()">Resetar Chave API Pollinations</div>
+    <p class="api-status" onclick="resetApiKey()">✨ Gerenciar Acesso IA</p>
   </div>
 </main>
 
@@ -142,103 +153,93 @@
 let API_KEY = localStorage.getItem('pollinations_key');
 
 function resetApiKey() {
-    localStorage.removeItem('pollinations_key');
-    API_KEY = null;
-    alert("Chave removida. O site pedirá uma nova no próximo envio.");
+    const key = prompt("Insira sua chave Pollinations:");
+    if(key !== null) {
+        localStorage.setItem('pollinations_key', key);
+        API_KEY = key;
+        location.reload();
+    }
 }
 
-
 const leafContainer = document.getElementById('leaves-container');
-for (let i = 0; i < 15; i++) {
+const emojis = ['🍃', '🌿', '🍁', '🍂'];
+for (let i = 0; i < 20; i++) {
     const leaf = document.createElement('div');
-    leaf.className = 'leaf'; leaf.textContent = '🍃';
+    leaf.className = 'leaf'; 
+    leaf.textContent = emojis[Math.floor(Math.random() * emojis.length)];
     leaf.style.left = Math.random() * 100 + 'vw';
-    leaf.style.animationDuration = (5 + Math.random() * 10) + 's';
+    leaf.style.fontSize = (Math.random() * 1 + 1) + 'rem';
+    leaf.style.animationDuration = (7 + Math.random() * 12) + 's';
+    leaf.style.animationDelay = Math.random() * 5 + 's';
     leafContainer.appendChild(leaf);
 }
 
-
 const contents = {
-    mat: "<h4>Matemática</h4><p>Foco: Funções, Álgebra e Geometria. Estude as bases para avançar em cálculos complexos.</p>",
-    bio: "<h4>Biologia</h4><p>Foco: Citologia e Genética. A vida começa na compreensão da célula.</p>",
-    geo: "<h4>Geografia</h4><p>Foco: Cartografia e Geopolítica Mundial.</p>",
-    hist: "<h4>História</h4><p>Foco: Idade Média e Revoluções Industriais.</p>",
-    art: "<h4>Artes</h4><p>Foco: Renascimento e Arte Contemporânea.</p>",
-    filo: "<h4>Filosofia</h4><p>Foco: Ética, Lógica e os Pré-Socráticos.</p>",
-    fis: "<h4>Física</h4><p>Foco: Termodinâmica e Mecânica Clássica.</p>",
-    qui: "<h4>Química</h4><p>Foco: Tabela Periódica e Estequiometria.</p>"
+    mat: "<h4>Matemática</h4><p>Explore o universo dos números. Foque em <b>Cálculo, Álgebra e Estatística</b>.</p>",
+    bio: "<h4>Biologia</h4><p>A ciência da vida. Mergulhe em <b>Genética, Ecologia e Fisiologia Humana</b>.</p>",
+    geo: "<h4>Geografia</h4><p>Entenda o mundo. Estude <b>Geopolítica, Climatologia e Urbanização</b>.</p>",
+    hist: "<h4>História</h4><p>As raízes da humanidade. Analise <b>Brasil Colônia, Revoluções Modernas e Guerras Mundiais</b>.</p>",
+    art: "<h4>Artes</h4><p>A expressão da alma. Estude <b>História da Arte, Estética e Movimentos Modernistas</b>.</p>",
+    filo: "<h4>Filosofia</h4><p>O poder do pensamento. Explore <b>Ética, Existencialismo e Epistemologia</b>.</p>",
+    fis: "<h4>Física</h4><p>As leis do universo. Domine <b>Mecânica Quântica, Óptica e Eletromagnetismo</b>.</p>",
+    qui: "<h4>Química</h4><p>A transformação da matéria. Foque em <b>Química Orgânica e Termoquímica</b>.</p>"
 };
 
-function showTopic(id) {
-    document.getElementById('studyArea').style.display = 'block';
-    document.getElementById('content-display').innerHTML = contents[id];
-    document.getElementById('studyTitle').textContent = id.toUpperCase();
+function showTopic(id, element) {
+    document.querySelectorAll('.topic-card').forEach(c => c.classList.remove('active'));
+    element.classList.add('active');
+    
+    const area = document.getElementById('studyArea');
+    const display = document.getElementById('content-display');
+    
+    area.style.display = 'block';
+    display.innerHTML = contents[id];
+    area.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
-
 
 async function sendMessage() {
     const input = document.getElementById('chatInput');
+    const chat = document.getElementById('chatMessages');
+    const btn = document.getElementById('sendBtn');
     const msg = input.value.trim();
+
     if(!msg) return;
 
-    // Nova atualização pa teu site. (eu n sei se figou boa mas tá td bem.)
-    if (!API_KEY) {
-        API_KEY = prompt("Por favor, insira sua Chave de API do Pollinations.ai para continuar:");
-        if (API_KEY) {
-            localStorage.setItem('pollinations_key', API_KEY);
-        } else {
-            alert("A chave é necessária para usar o chat com IA.");
-            return;
-        }
-    }
-
-    const chat = document.getElementById('chatMessages');
-    const sendBtn = document.getElementById('sendBtn');
-
-    
-    const userDiv = document.createElement('div');
-    userDiv.className = 'msg-bubble user';
-    userDiv.textContent = msg;
-    chat.appendChild(userDiv);
+    appendMessage('user', msg);
     input.value = '';
-    chat.scrollTop = chat.scrollHeight;
-
     
-    const thinkingDiv = document.createElement('div');
-    thinkingDiv.className = 'msg-bubble ai';
-    thinkingDiv.textContent = "O professor está analisando sua pergunta...";
-    chat.appendChild(thinkingDiv);
-    sendBtn.disabled = true;
+    const thinkingDiv = appendMessage('ai', "Colhendo conhecimento...");
+    btn.disabled = true;
 
     try {
-        const response = await fetch('https://text.pollinations.ai/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${API_KEY}`
-            },
-            body: JSON.stringify({
-                messages: [
-                    { role: 'system', content: 'Você é um professor tutor do Jardim do Saber. Responda de forma clara, educada e sempre em Português do Brasil.' },
-                    { role: 'user', content: msg }
-                ],
-                model: 'openai'
-            })
-        });
-
-        if (!response.ok) throw new Error('Erro na chave ou conexão');
+        const response = await fetch(`https://text.pollinations.ai/${encodeURIComponent(msg)}?system=${encodeURIComponent("Você é um professor tutor do Jardim do Saber. Responda de forma didática e em Português.")}`);
+        
+        if (!response.ok) throw new Error();
 
         const data = await response.text();
         thinkingDiv.innerHTML = data.replace(/\n/g, "<br>");
 
     } catch (error) {
-        thinkingDiv.textContent = "Erro: Não foi possível conectar à IA. Verifique sua chave API.";
-        console.error(error);
+        thinkingDiv.textContent = "Houve uma geada nos meus circuitos. Tente novamente em breve!";
     } finally {
-        sendBtn.disabled = false;
+        btn.disabled = false;
         chat.scrollTop = chat.scrollHeight;
     }
 }
+
+function appendMessage(type, text) {
+    const chat = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = `msg-bubble ${type}`;
+    div.textContent = text;
+    chat.appendChild(div);
+    chat.scrollTo({ top: chat.scrollHeight, behavior: 'smooth' });
+    return div;
+}
+
+document.getElementById('chatInput').addEventListener('keypress', (e) => {
+    if(e.key === 'Enter') sendMessage();
+});
 </script>
 </body>
 </html>
